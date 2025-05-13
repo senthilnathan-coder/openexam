@@ -1,20 +1,68 @@
-import React from 'react'
+import React from 'react';
 import MainLayout from './Layout/main';
-import { BrowserRouter, Route, Router, Routes } from 'react-router-dom';
+import AuthLayout from './Layout/auth';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './Pages/Home';
 
-const App = () => {
-  return (
-    <React.Fragment>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<MainLayout />}>
-            <Route path='/home' element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </React.Fragment>
-  )
-}
+import { AuthProvider } from './context/AuthContext';
+import Login from './Pages/Registration/Login';
+import Signup from './Pages/Registration/Signup';
+import Quizzes from './Pages/Paginations/Quizzes';
+import Paperassign from './Pages/Paginations/Paperassign';
+import Aiquizz from './Pages/Paginations/Aiquizz';
+import Interactive from './Pages/Paginations/Interactive';
+import Codeassign from './Pages/Paginations/Codeassign';
+import Online from './Pages/Paginations/Online';
+import Paper from './Pages/Paginations/Paper';
+import Aiquestion from './Pages/Paginations/Aiquizz';
+import Aiquestions from './Pages/Paginations/Aiquestions';
+import AdminLogin from './Pages/Admin/AdminLogin';
+import UserAdminDashboard from './Pages/Admin/UserAdminDashboard';
 
-export default App
+const App = () => {
+    return (
+        <React.Fragment>
+            <AuthProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<MainLayout />}>
+                            <Route index element={<Navigate to="/home" />} />
+                            <Route path='home' element={<Home />} />
+                            
+                            {/* Authentication Routes */}
+                            <Route path='login' element={<Login />} />
+                            <Route path='signup' element={<Signup />} />
+                            
+                            {/* Exam and Assessment Routes */}
+                            <Route path='online-exam' element={<Online />} />
+                            <Route path='paper-exams' element={<Paper />} />
+                            <Route path='quizzes' element={<Quizzes />} />
+                            
+
+
+
+
+
+                            
+                            {/* Assignment Routes */}
+                            <Route path='code-assignment' element={<Codeassign />} />
+                            <Route path='paper-assignment' element={<Paperassign />} />
+                            
+                            {/* AI and Interactive Routes */}
+                            <Route path='ai-questions' element={<Aiquestions/>} />
+                            <Route path='aiquizzes' element={<Aiquizz/>} />
+                            <Route path='lessons' element={<Interactive />} />
+                            
+                            {/* Admin Routes */}
+                            <Route path="/admin/login" element={<AdminLogin />} />
+                            
+                            <Route path="/admin/user-dashboard" element={<UserAdminDashboard />} />
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+            </AuthProvider>
+        </React.Fragment>
+    );
+};
+
+export default App;

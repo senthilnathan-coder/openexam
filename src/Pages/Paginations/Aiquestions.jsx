@@ -1,0 +1,321 @@
+import React, { useState, useEffect } from 'react';
+import { FaRobot, FaSpinner } from 'react-icons/fa';
+import { MdSettings } from 'react-icons/md';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const Aiquestions = () => {
+  const [formData, setFormData] = useState({
+    topic: '',
+    count: 5,
+    difficulty: 'medium',
+  });
+
+  // Add these new state variables
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedAudio, setSelectedAudio] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
+  const [questions, setQuestions] = useState([]);
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60); // 1 minutes in seconds
+  const [timerActive, setTimerActive] = useState(false);
+
+  const handleAnswerSelect = (questionIndex, answer) => {
+    if (!showResults && timeLeft > 0) { // Only allow selection if quiz is not finished and time remains
+      setSelectedAnswers(prev => ({
+        ...prev,
+        [questionIndex]: answer
+      }));
+    }
+  };
+
+  useEffect(() => {
+    let timer;
+    if (timerActive && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      toast.warning("Time's up! Submitting quiz...");
+      handleSubmit();
+    }
+    return () => clearInterval(timer);
+  }, [timerActive, timeLeft]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleGenerate = async () => {
+    if (!formData.topic && !selectedImage && !selectedAudio && !selectedVideo) {
+      toast.error('Please enter a topic or upload media content');
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('content', formData.topic);
+    formDataToSend.append('submitted', '0');
+
+    // Append media files if they exist
+    if (selectedImage) formDataToSend.append('image', selectedImage);
+    if (selectedAudio) formDataToSend.append('audio', selectedAudio);
+    if (selectedVideo) formDataToSend.append('video', selectedVideo);
+
+    setIsGenerating(true);
+    toast.info('Generating questions... This may take a few seconds.');
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/generate_quiz/', {  // Updated URL
+        method: 'POST',
+        body: formDataToSend,
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.questions) {
+        setQuestions(data.questions);
+        setShowQuestions(true);
+        setSelectedAnswers({});
+        setShowResults(false);
+        setTimeLeft(60);
+        setTimerActive(true);
+        toast.success('Questions generated successfully!');
+      } else {
+        throw new Error('No questions found in response');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(`Failed to generate questions: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+
+  const handleSubmit = () => {
+    setTimerActive(false); // Stop the timer
+    let correctCount = 0;
+    questions.forEach((question, index) => {
+      if (selectedAnswers[index] === question.answer) {
+        correctCount++;
+      }
+    });
+    const finalScore = (correctCount / questions.length) * 100;
+    setScore(finalScore);
+    setShowResults(true);
+
+    // Show score message
+    if (finalScore >= 80) {
+      toast.success(`Great job! Score: ${finalScore.toFixed(1)}%`);
+    } else if (finalScore >= 50) {
+      toast.info(`Good attempt! Score: ${finalScore.toFixed(1)}%`);
+    } else {
+      toast.warning(`Keep practicing! Score: ${finalScore.toFixed(1)}%`);
+    }
+  };
+
+  // Update the form UI
+  return (
+    <div className="min-h-screen bg-gradient-to-r from-slate-900 to-purple-900 p-6 mt-20">
+      <ToastContainer position="top-right" theme="dark" />
+      <div className="max-w-3xl mx-auto">
+        {!showQuestions ? (
+          <div className="space-y-8">
+            <div className="text-center">
+              <FaRobot className="w-20 h-20 text-purple-400 mx-auto mb-4 animate-pulse" />
+              <h1 className="text-4xl font-bold text-white mb-2">AI Quiz Generator</h1>
+              <p className="text-purple-200 text-lg">Create quizzes instantly</p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 space-y-6">
+              {/* Topic Input with Icon */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter your quiz topic..."
+                  value={formData.topic}
+                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                  className="w-full p-4 pl-12 bg-white/5 border border-purple-500/30 rounded-xl text-white placeholder-purple-200/50 focus:outline-none focus:border-purple-500"
+                />
+                <FaRobot className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 text-lg" />
+              </div>
+
+              {/* File Upload Section */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative group">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setSelectedImage(e.target.files[0])}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="block p-4 bg-white/5 border border-purple-500/30 rounded-xl text-purple-200 cursor-pointer hover:bg-white/10 transition-all text-center"
+                  >
+                    {selectedImage ? '✓ Image Selected' : '+ Add Image'}
+                  </label>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={(e) => setSelectedAudio(e.target.files[0])}
+                    className="hidden"
+                    id="audio-upload"
+                  />
+                  <label
+                    htmlFor="audio-upload"
+                    className="block p-4 bg-white/5 border border-purple-500/30 rounded-xl text-purple-200 cursor-pointer hover:bg-white/10 transition-all text-center"
+                  >
+                    {selectedAudio ? '✓ Audio Selected' : '+ Add Audio'}
+                  </label>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => setSelectedVideo(e.target.files[0])}
+                    className="hidden"
+                    id="video-upload"
+                  />
+                  <label
+                    htmlFor="video-upload"
+                    className="block p-4 bg-white/5 border border-purple-500/30 rounded-xl text-purple-200 cursor-pointer hover:bg-white/10 transition-all text-center"
+                  >
+                    {selectedVideo ? '✓ Video Selected' : '+ Add Video'}
+                  </label>
+                </div>
+              </div>
+
+              {/* Questions Count Input */}
+              <div className="flex items-center space-x-4">
+                <label className="text-purple-200">Questions:</label>
+                <input
+                  type="number"
+                  value={formData.count}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      count: Math.min(10, Math.max(1, parseInt(e.target.value) || 1)),
+                    })
+                  }
+                  className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center"
+                  min="1"
+                  max="10"
+                />
+              </div>
+
+              {/* Generate Button */}
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="w-full p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <FaSpinner className="animate-spin" />
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <FaRobot className="text-xl" />
+                    <span>Generate Quiz</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl text-white font-semibold">Quiz Questions</h2>
+              <div className="flex items-center gap-4">
+                <span className="text-white font-mono text-xl">
+                  {formatTime(timeLeft)}
+                </span>
+                <button
+                  onClick={() => setShowQuestions(false)}
+                  className="p-2 rounded-lg bg-purple-500/20 text-purple-300"
+                >
+                  <MdSettings />
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {questions.map((q, i) => (
+                <div key={i} className="bg-white/5 rounded-xl p-4">
+                  <p className="text-white mb-4">{`${i + 1}. ${q.question}`}</p>
+                  <div className="grid gap-2">
+                    {q.options.map((opt, j) => (
+                      <button
+                        key={j}
+                        onClick={() => handleAnswerSelect(i, opt)}
+                        className={`p-2 rounded-lg text-left ${selectedAnswers[i] === opt
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-white/5 text-purple-200 hover:bg-white/10'
+                          }`}
+                      >
+                        {`${String.fromCharCode(65 + j)}. ${opt}`}
+                      </button>
+                    ))}
+                  </div>
+                  {showResults && (
+                    <div className="mt-2 text-sm">
+                      <span
+                        className={
+                          selectedAnswers[i] === q.answer ? 'text-green-400' : 'text-red-400'
+                        }
+                      >
+                        {selectedAnswers[i] === q.answer
+                          ? '✓ Correct'
+                          : `✗ Incorrect (Answer: ${q.answer})`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {!showResults && (
+              <button
+                onClick={handleSubmit}
+                className="mt-6 w-full p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white"
+              >
+                Submit Quiz
+              </button>
+            )}
+
+            {showResults && (
+              <div className="mt-6 text-center text-white">
+                <h3 className="text-2xl font-bold">Your Score: {score.toFixed(1)}%</h3>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Aiquestions;
