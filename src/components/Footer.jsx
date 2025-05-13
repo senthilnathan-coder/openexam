@@ -5,8 +5,8 @@ const productLinks = [
     { name: 'Online Exams', path: '/online-exam' },
     { name: 'Paper Exams', path: '/paper-exams' },
     { name: 'Quizzes', path: '/quizzes' },
-    { name: 'AI Quiz Generator', path: '/aiquizzes' },
-    { name: 'AI Questions Generator', path: '/ai-questions' },
+    { name: 'AI Quiz Generator', path: '/ai-questions' },
+    // { name: 'AI Questions Generator', path: '/ai-questions' },
 ];
 
 const socialLinks = [

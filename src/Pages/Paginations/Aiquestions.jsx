@@ -62,6 +62,7 @@ const Aiquestions = () => {
     const formDataToSend = new FormData();
     formDataToSend.append('content', formData.topic);
     formDataToSend.append('submitted', '0');
+    formDataToSend.append('difficulty', formData.difficulty); // Add difficulty to request
 
     // Append media files if they exist
     if (selectedImage) formDataToSend.append('image', selectedImage);
@@ -216,14 +217,28 @@ const Aiquestions = () => {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      count: Math.min(10, Math.max(1, parseInt(e.target.value) || 1)),
+                      count: Math.min(20, Math.max(1, parseInt(e.target.value) || 1)),
                     })
                   }
                   className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center"
                   min="1"
-                  max="10"
+                  max="20"
                 />
               </div>
+
+              {/* Add difficulty selector before the questions count */}
+              {/* <div className="flex items-center space-x-4">
+                <label className="text-purple-200">Difficulty:</label>
+                <select
+                  value={formData.difficulty}
+                  onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                  className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white"
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div> */}
 
               {/* Generate Button */}
               <button

@@ -14,8 +14,8 @@ const menuItems = [
     { icon: <MdAssignment size={20} />, label: "Code Assignment", color: "text-blue-500", path: "/code-assignment" },
     { icon: <MdAssignment size={20} />, label: "Paper Assignment", color: "text-pink-500", path: "/paper-assignment" },
     { icon: <MdSchool size={20} />, label: "Interactive Lessons", color: "text-green-500", path: "/lessons" },
-    { icon: <TbBrandOpenai size={20} />, label: "AI Questions", color: "text-indigo-500", path: "/ai-questions" },
-    { icon: <MdQuiz size={20} />, label: "AI Quiz", color: "text-yellow-500", path: "/aiquizzes" },
+    { icon: <TbBrandOpenai size={20} />, label: "AI Quiz Generator", color: "text-indigo-500", path: "/ai-questions" },
+    // { icon: <MdQuiz size={20} />, label: "AI Questions", color: "text-yellow-500", path: "/aiquizzes" },
 ];
 
 const Header = () => {
@@ -33,7 +33,7 @@ const Header = () => {
         navigate('login');
     };
 
-    
+
     return (
         <div className='bg-gradient-to-r from-gray-900 to-gray-800 px-4 sm:px-6 py-4 fixed w-full top-0 z-50'>
             <div className='max-w-7xl mx-auto'>

@@ -18,6 +18,8 @@ import Aiquestion from './Pages/Paginations/Aiquizz';
 import Aiquestions from './Pages/Paginations/Aiquestions';
 import AdminLogin from './Pages/Admin/AdminLogin';
 import UserAdminDashboard from './Pages/Admin/UserAdminDashboard';
+import SuperAdminLogin from './Pages/Admin/SuperAdminLogin';
+import SuperAdminDashboard from './Pages/Admin/SuperAdminDashboard';
 
 const App = () => {
     return (
@@ -57,6 +59,8 @@ const App = () => {
                             <Route path="/admin/login" element={<AdminLogin />} />
                             
                             <Route path="/admin/user-dashboard" element={<UserAdminDashboard />} />
+                            <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+                            <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>
