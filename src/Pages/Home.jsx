@@ -57,7 +57,7 @@ const Home = () => {
                 </div>
 
                 {/* Features Preview */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
                     {[
                         { title: "AI Question Generation", desc: "Generate unique questions instantly" },
                         { title: "Smart Assessment", desc: "Automated grading and feedback" },
@@ -72,7 +72,7 @@ const Home = () => {
                             <p className="text-gray-400">{feature.desc}</p>
                         </div>
                     ))}
-                </div>
+                </div> */}
 
 
             </div>

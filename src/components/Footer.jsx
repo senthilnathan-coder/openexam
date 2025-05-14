@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaLinkedin, FaYoutube, FaTwitter, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { TbBrandOpenai } from "react-icons/tb";
+import react from "../assets/react.svg"
 
 const socialLinks = [
     { icon: <FaLinkedin size={20} />, path: '/', label: 'LinkedIn' },
@@ -17,11 +18,11 @@ const Footer = () => {
                     {/* Brand Section */}
                     <div className="space-y-6">
                         <div className="flex items-center">
-                            <TbBrandOpenai className="text-3xl text-blue-500" />
-                            <span className="ml-3 text-2xl font-bold text-white">DigiquestAi</span>
+                            <img src={react} alt="Logo" className="text-3xl text-blue-500" />
+                            <span className="ml-3 text-2xl font-bold text-white">DigiAiquest</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
-                            The next generation of AI-powered examination platform. 
+                            The next generation of AI-powered examination platform.
                             Revolutionizing the way we learn and assess.
                         </p>
                         <div className="flex space-x-4">
