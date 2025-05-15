@@ -21,8 +21,8 @@ const logos = [
 
 const Scrolling = () => {
     return (
-        <div className="w-full bg-gradient-to-r from-gray-100 to-gray-200 py-12">
-            <div className="max-w-7xl mx-auto px-4">
+        <div className="w-full bg-gradient-to-r from-gray-100 to-gray-200 ">
+            {/* <div className="max-w-7xl mx-auto px-4">
                 <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-10">
                     Trusted by Leading Brands Worldwide
                 </h2>
@@ -52,7 +52,7 @@ const Scrolling = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };
