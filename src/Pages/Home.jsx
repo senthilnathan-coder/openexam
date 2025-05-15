@@ -15,19 +15,19 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 mt-10">
-            <div className="px-4 py-20 max-w-7xl mx-auto">
+            <div className="px-4 py-20 max-w-7xl mx-auto ">
                 {/* Hero Section */}
-                <div className="text-center mb-16">
+                <div className="text-center mb-16  ">
                     <div className="flex justify-center mb-8">
                         <TbBrandOpenai className="text-7xl text-blue-500 animate-pulse" />
                     </div>
-                    <h1 className="text-4xl sm:text-6xl font-bold text-white mb-6">
+                    <h1 className="text-4xl sm:text-6xl font-bold text-white mb-6 ">
                         DigiAiquest<br />
-                        <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+                        <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text ">
                             AI-Powered Question Generator
                         </span>
                     </h1>
-                    <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+                    <p className="text-gray-400 max-w-2xl mx-auto text-lg ">
                         Transform your learning experience with our revolutionary AI-powered
                         examination platform. Coming soon to revolutionize education.
                     </p>

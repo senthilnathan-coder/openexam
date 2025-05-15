@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaRobot, FaSpinner } from 'react-icons/fa';
 import { MdSettings } from 'react-icons/md';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import 'react-toastify/dist/ReactToastify.css';
 
 const Aiquestions = () => {
   const [formData, setFormData] = useState({
