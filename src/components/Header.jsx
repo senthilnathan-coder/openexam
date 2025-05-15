@@ -3,7 +3,7 @@ import { TbBrandOpenai } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 import { FaUserCog } from 'react-icons/fa';
 import { TbWorld } from "react-icons/tb";
-import react from "../assets/react.svg"
+import company from "../assets/DigiAiquest_four.png"
 
 const Header = () => {
     const navigate = useNavigate();
@@ -14,11 +14,11 @@ const Header = () => {
                 <div className='flex justify-between items-center backdrop-blur-lg bg-white/10 rounded-2xl p-2'>
                     {/* Logo Section */}
                     <div
-                        className='flex items-center gap-2 cursor-pointer'
+                        className='flex items-center gap-2 cursor-pointer px-3'
                         onClick={() => navigate('/')}
                     >
                         {/* <TbBrandOpenai className="text-3xl text-blue-500" /> */}
-                        <img src={react} alt="Logo" className="text-3xl text-blue-500" />
+                        <img src={company} alt='Logo' className=" text-blue-500 animate-pulse w-[30px]" />
                         <span className='text-white font-bold text-xl'>DigiAiquest</span>
                         <span className='bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded-full ml-2'>
                             Coming Soon

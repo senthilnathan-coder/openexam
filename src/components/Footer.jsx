@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaLinkedin, FaYoutube, FaTwitter, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { TbBrandOpenai } from "react-icons/tb";
-import react from "../assets/react.svg"
+import company from "../assets/DigiAiquest_four.png"
 
 const socialLinks = [
     { icon: <FaLinkedin size={20} />, path: '/', label: 'LinkedIn' },
@@ -18,7 +18,7 @@ const Footer = () => {
                     {/* Brand Section */}
                     <div className="space-y-6">
                         <div className="flex items-center">
-                            <img src={react} alt="Logo" className="text-3xl text-blue-500" />
+                        <img src={company} alt='Logo' className=" text-blue-500 animate-pulse w-[50px]" />
                             <span className="ml-3 text-2xl font-bold text-white">DigiAiquest</span>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
