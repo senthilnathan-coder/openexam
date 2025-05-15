@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaLinkedin, FaYoutube, FaTwitter, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { TbBrandOpenai } from "react-icons/tb";
-import company from "../assets/DigiAiquest_four.png"
+import company from "../assets/DigiAiQuest.png"
 
 const socialLinks = [
     { icon: <FaLinkedin size={20} />, path: '/', label: 'LinkedIn' },
@@ -18,8 +18,8 @@ const Footer = () => {
                     {/* Brand Section */}
                     <div className="space-y-6">
                         <div className="flex items-center">
-                        <img src={company} alt='Logo' className=" text-blue-500 animate-pulse w-[50px]" />
-                            <span className="ml-3 text-2xl font-bold text-white">DigiAiquest</span>
+                            <img src={company} alt='Logo' className=" text-blue-500 animate-pulse w-[140px]" />
+                            {/* <span className="ml-3 text-2xl font-bold text-white">DigiAiquest</span> */}
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             The next generation of AI-powered examination platform.
@@ -83,7 +83,7 @@ const Footer = () => {
                 <div className="pt-8 border-t border-white/10">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         <p className="text-gray-400 text-sm">
-                            © {new Date().getFullYear()} DigiquestAi. All rights reserved.
+                            © {new Date().getFullYear()} DigiAiQuest. All rights reserved.
                         </p>
                         <div className="flex items-center space-x-6">
                             <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors duration-300">
