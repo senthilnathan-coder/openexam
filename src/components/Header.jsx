@@ -128,6 +128,8 @@ const Header = () => {
                     <div className='flex items-center gap-4 justify-center'>
                         <div className="relative bottom-3">
                             <Select
+                                className='text-white/80 '
+                                placeholder='Select a country'
                                 options={groupedOptions}
                                 styles={customStyles}
                                 isSearchable={false}
@@ -143,7 +145,7 @@ const Header = () => {
                                         <FaGlobe size={22} className="text-white/80 hover:text-white transition-colors duration-200 " />
                                     ),
                                     Option: ({ data, isSelected, ...props }) => (
-                                        <div {...props} className="flex items-center justify-between">
+                                        <div {...props} className="flex items-center justify-between ">
                                             <span>{data.label}</span>
                                             {isSelected && <FaCheck className="text-green-400" size={12} />}
                                         </div>

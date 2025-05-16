@@ -6,8 +6,13 @@ import Home from './Pages/Home';
 import Aiquestions from './Pages/Paginations/Aiquestions';
 import Login from './Pages/Registration/Login';
 import Signup from './Pages/Registration/Signup';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 
 import { AuthProvider } from './context/AuthContext';
+import Dashboard from './Pages/Admin/Dashboard';
+import UserDashboard from './Pages/User/Dashboard';
+import PricingPlans from './Pages/Pricing/PricingPlans';
+import CustomPackageBuilder from './components/CustomPackageBuilder';
 // import Login from './Pages/Registration/Login';
 // import Signup from './Pages/Registration/Signup';
 // import Quizzes from './Pages/Paginations/Quizzes';
@@ -37,6 +42,11 @@ const App = () => {
                             {/* Authentication Routes */}
                             <Route path='login' element={<Login />} />
                             <Route path='signup' element={<Signup />} />
+                            <Route path='dashboard' element={<Dashboard />} />
+                            <Route path='userdashboard' element={<UserDashboard />} />
+                            <Route path='PricingPlans' element={<PricingPlans />} />
+                            <Route path='CustomPackageBuilder' element={<CustomPackageBuilder />} />
+                            <Route path='SubscriptionProvider' element={<SubscriptionProvider />} />
                             
                             {/* Exam and Assessment Routes */}
                             {/* <Route path='online-exam' element={<Online />} />
