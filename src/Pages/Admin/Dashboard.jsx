@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaChartBar, FaList, FaClipboardCheck, FaRobot, FaComments, FaFileUpload, FaClock, FaSearch, FaBell } from 'react-icons/fa';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LineChart, Line } from 'recharts';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -58,6 +60,20 @@ const Dashboard = () => {
 
   const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
 
+  // Add new state for trend data
+  const [trendData, setTrendData] = useState([
+    { date: '2024-01', questions: 45 },
+    { date: '2024-02', questions: 62 },
+    { date: '2024-03', questions: 78 },
+    { date: '2024-04', questions: 95 }
+  ]);
+
+  // Add animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-slate-900 to-purple-900 p-3 sm:p-4 md:p-6 mt-23 sm:mt-20">
       <div className="max-w-7xl mx-auto">
@@ -84,20 +100,71 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.1
+              }
+            }
+          }}
+        >
           {[
             { icon: <FaList className="text-lg sm:text-xl" />, title: "Questions Uploaded", value: stats.questionsUploaded, color: "from-purple-500 to-pink-500" },
             { icon: <FaClipboardCheck className="text-lg sm:text-xl" />, title: "Pending Reviews", value: stats.pendingReviews, color: "from-blue-500 to-cyan-500" },
             { icon: <FaRobot className="text-lg sm:text-xl" />, title: "AI Suggestions", value: stats.aiSuggestions, color: "from-green-500 to-emerald-500" },
             { icon: <FaChartBar className="text-lg sm:text-xl" />, title: "Quiz Sets Created", value: stats.quizSets, color: "from-orange-500 to-red-500" }
           ].map((stat, index) => (
-            <StatCard key={index} {...stat} />
+            <motion.div key={index} variants={cardVariants}>
+              <StatCard {...stat} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Charts Section */}
+        {/* New Trend Chart Section */}
+        <motion.div 
+          className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
+            <FaChartBar className="mr-2" />
+            Question Upload Trends
+          </h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="date" stroke="#ffffff80" />
+              <YAxis stroke="#ffffff80" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#1f2937', border: 'none' }}
+                labelStyle={{ color: '#fff' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="questions"
+                stroke="#8884d8"
+                strokeWidth={2}
+                dot={{ fill: '#8884d8' }}
+                animationDuration={2000}
+                animationEasing="ease-in-out"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+
+        {/* Enhanced Charts Section with Animations */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 transform hover:scale-[1.02] transition-all">
+          <motion.div
+            className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 transform hover:scale-[1.02] transition-all"
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
               <FaChartBar className="mr-2" />
               Performance Analytics
@@ -121,9 +188,14 @@ const Dashboard = () => {
                 </defs>
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
 
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 transform hover:scale-[1.02] transition-all">
+          <motion.div
+            className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 transform hover:scale-[1.02] transition-all"
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
               <FaList className="mr-2" />
               Topics Distribution
@@ -152,11 +224,16 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Action Panels */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <ActionPanel
             icon={<FaFileUpload className="text-xl sm:text-2xl" />}
             title="Bulk Upload"
@@ -171,7 +248,7 @@ const Dashboard = () => {
             action={() => {/* Handle scheduling */}}
             gradient="from-blue-500 to-cyan-500"
           />
-        </div>
+        </motion.div>
       </div>
     </div>
   );
