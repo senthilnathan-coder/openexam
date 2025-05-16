@@ -126,7 +126,7 @@ const Header = () => {
                     </div>
 
                     <div className='flex items-center gap-4 justify-center'>
-                        <div className="relative">
+                        <div className="relative bottom-3">
                             <Select
                                 options={groupedOptions}
                                 styles={customStyles}
@@ -145,22 +145,22 @@ const Header = () => {
                                     Option: ({ data, isSelected, ...props }) => (
                                         <div {...props} className="flex items-center justify-between">
                                             <span>{data.label}</span>
-                                            {isSelected && <FaCheck className="text-green-400 " size={12} />}
+                                            {isSelected && <FaCheck className="text-green-400" size={12} />}
                                         </div>
                                     )
                                 }}
                             />
                         </div>
                         <button
-    onClick={() => navigate('/login')}
-    className="cursor-pointer flex items-center justify-center gap-2 
+                            onClick={() => navigate('/login')}
+                            className="cursor-pointer flex items-center justify-center gap-2 
                bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-600 hover:to-blue-600
                text-white font-semibold px-5 py-2.5 rounded-2xl shadow-lg 
                hover:scale-105 transition-transform duration-300 ease-in-out"
->
-    <FaSignInAlt className="text-lg" />
-    Login
-</button>
+                        >
+                            <FaSignInAlt className="text-lg" />
+                            Login
+                        </button>
                     </div>
                 </div>
             </div>

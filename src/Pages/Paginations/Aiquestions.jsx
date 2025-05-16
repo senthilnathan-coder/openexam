@@ -5,10 +5,12 @@ import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
 const Aiquestions = () => {
+  // Update the initial state count to 10
   const [formData, setFormData] = useState({
     topic: '',
-    count: 5,
+    count: 10,  // Changed from 5 to 10
     difficulty: 'medium',
+    questionType: 'mcq'  // Add questionType to initial state
   });
 
   // Add these new state variables
@@ -61,8 +63,9 @@ const Aiquestions = () => {
 
     const formDataToSend = new FormData();
     formDataToSend.append('content', formData.topic);
-    formDataToSend.append('submitted', '0');
-    formDataToSend.append('difficulty', formData.difficulty); // Add difficulty to request
+    formDataToSend.append('difficulty', formData.difficulty);
+    formDataToSend.append('question_type', formData.questionType);
+    formDataToSend.append('count', formData.count.toString());
 
     // Append media files if they exist
     if (selectedImage) formDataToSend.append('image', selectedImage);
@@ -73,36 +76,42 @@ const Aiquestions = () => {
     toast.info('Generating questions... This may take a few seconds.');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/generate_quiz/', {  // Updated URL
+      const response = await fetch('http://127.0.0.1:8000/generate_quiz/', {
         method: 'POST',
         body: formDataToSend,
         mode: 'cors',
-        headers: {
-          'Accept': 'application/json',
-        },
       });
 
+      // First check if response is ok before parsing JSON
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Server error response:', errorText);
         throw new Error(`Server error: ${response.status}`);
       }
 
       const data = await response.json();
 
-      if (data.questions) {
-        setQuestions(data.questions);
-        setShowQuestions(true);
-        setSelectedAnswers({});
-        setShowResults(false);
-        setTimeLeft(60);
-        setTimerActive(true);
-        toast.success('Questions generated successfully!');
-      } else {
-        throw new Error('No questions found in response');
+      // Validate the response data structure
+      if (!data || !Array.isArray(data.questions)) {
+        console.error('Invalid response format:', data);
+        throw new Error('Invalid response from server');
       }
+
+      if (data.questions.length === 0) {
+        throw new Error('No questions were generated');
+      }
+
+      setQuestions(data.questions);
+      setShowQuestions(true);
+      setSelectedAnswers({});
+      setShowResults(false);
+      setTimeLeft(60);
+      setTimerActive(true);
+      toast.success('Questions generated successfully!');
+
     } catch (error) {
-      console.error('Error:', error);
-      toast.error(`Failed to generate questions: ${error.message}`);
+      console.error('Generation error details:', error);
+      toast.error(error.message || 'Failed to generate questions');
     } finally {
       setIsGenerating(false);
     }
@@ -209,37 +218,50 @@ const Aiquestions = () => {
               </div>
 
               {/* Questions Count Input */}
-              <div className="flex items-center space-x-4">
-                <label className="text-purple-200">Questions:</label>
-                <input
-                  type="number"
-                  value={formData.count}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      count: Math.min(20, Math.max(1, parseInt(e.target.value) || 1)),
-                    })
-                  }
-                  className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center"
-                  min="1"
-                  max="20"
-                />
+
+              <div className="flex items-center justify-between space-x-4 mb-4">
+                <div className="flex items-center space-x-4">
+                  <label className="text-purple-200">Questions:</label>
+                  <input
+                    type="number"
+                    value={formData.count}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        count: Math.min(10, Math.max(1, parseInt(e.target.value) || 10)),
+                      })
+                    }
+                    className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center"
+                    min="1"
+                    max="20"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <label className="text-purple-200">Difficulty:</label>
+                  <select
+                    value={formData.difficulty}
+                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                    className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white focus:outline-none cursor-pointer"
+                  >
+                    <option className='text-blue-500' value="easy">Easy</option>
+                    <option className='text-blue-500' value="medium">Medium</option>
+                    <option className='text-blue-500' value="hard">Hard</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <label className="text-purple-200">Type:</label>
+                  <select
+                    value={formData.questionType}
+                    onChange={(e) => setFormData({ ...formData, questionType: e.target.value })}
+                    className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white focus:outline-none cursor-pointer"
+                  >
+                    <option className='text-blue-500' value="mcq">Multiple Choice</option>
+                    <option className='text-blue-500' value="true_false">True/False</option>
+                  </select>
+                </div>
               </div>
-
-              {/* Add difficulty selector before the questions count */}
-              {/* <div className="flex items-center space-x-4">
-                <label className="text-purple-200">Difficulty:</label>
-                <select
-                  value={formData.difficulty}
-                  onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                  className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white"
-                >
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
-              </div> */}
-
               {/* Generate Button */}
               <button
                 onClick={handleGenerate}
