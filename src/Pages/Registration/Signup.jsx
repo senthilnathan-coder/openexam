@@ -158,7 +158,7 @@ const Signup = () => {
                     <div className="flex space-x-4">
                         <div className="w-1/3">
                             <div className="relative">
-                                <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-200/60" />
+                                <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-200/60 rotate-90" />
                                 <input
                                     {...formik.getFieldProps('countryCode')}
                                     placeholder="+91"

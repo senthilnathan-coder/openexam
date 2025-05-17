@@ -67,15 +67,15 @@ const cards = [
         path: "/ai-questions",
         isComingSoon: true
     },
-    {
-        icon: <MdQuiz className="text-4xl text-violet-500" />,
-        title: "AI Quiz Generator",
-        description: "",
-        bgColor: "bg-violet-50",
-        hoverColor: "hover:bg-violet-100",
-        path: "/aiquizzes",
-        isComingSoon: true
-    },
+    // {
+    //     icon: <MdQuiz className="text-4xl text-violet-500" />,
+    //     title: "AI Quiz Generator",
+    //     description: "",
+    //     bgColor: "bg-violet-50",
+    //     hoverColor: "hover:bg-violet-100",
+    //     path: "/aiquizzes",
+    //     isComingSoon: true
+    // },
     {
         icon: <MdSchool className="text-4xl text-teal-500" />,
         title: "Learning Analytics",
@@ -85,33 +85,33 @@ const cards = [
         path: "/",
         isComingSoon: true
     },
-    {
-        icon: <MdAssignment className="text-4xl text-pink-500" />,
-        title: "Paper Assignment",
-        description: "",
-        bgColor: "bg-pink-50",
-        hoverColor: "hover:bg-pink-100",
-        path: "/paper-assignment",
-        isComingSoon: true
-    },
-    {
-        icon: <TbPlayerPlay className="text-4xl text-emerald-500" />,
-        title: "Interactive Lessons",
-        description: "",
-        bgColor: "bg-emerald-50",
-        hoverColor: "hover:bg-emerald-100",
-        path: "/lessons",
-        isComingSoon: true
-    },
-    {
-        icon: <TbPlayerPlay className="text-4xl text-emerald-500" />,
-        title: "Interactive Lessons",
-        description: "",
-        bgColor: "bg-emerald-50",
-        hoverColor: "hover:bg-emerald-100",
-        path: "/lessons",
-        isComingSoon: true
-    },
+    // {
+    //     icon: <MdAssignment className="text-4xl text-pink-500" />,
+    //     title: "Paper Assignment",
+    //     description: "",
+    //     bgColor: "bg-pink-50",
+    //     hoverColor: "hover:bg-pink-100",
+    //     path: "/paper-assignment",
+    //     isComingSoon: true
+    // },
+    // {
+    //     icon: <TbPlayerPlay className="text-4xl text-emerald-500" />,
+    //     title: "Interactive Lessons",
+    //     description: "",
+    //     bgColor: "bg-emerald-50",
+    //     hoverColor: "hover:bg-emerald-100",
+    //     path: "/lessons",
+    //     isComingSoon: true
+    // },
+    // {
+    //     icon: <TbPlayerPlay className="text-4xl text-emerald-500" />,
+    //     title: "Interactive Lessons",
+    //     description: "",
+    //     bgColor: "bg-emerald-50",
+    //     hoverColor: "hover:bg-emerald-100",
+    //     path: "/lessons",
+    //     isComingSoon: true
+    // },
 ];
 
 const Section_two = () => {
@@ -141,7 +141,7 @@ const Section_two = () => {
                                 <p className="text-2xl font-bold text-white">Coming Soon</p>
                             </div>
 
-                           
+
                             <div className="group relative overflow-hidden rounded-xl p-6 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                                 <div className={`${card.bgColor} absolute inset-0 opacity-50 transition-opacity duration-300 group-hover:opacity-75`} />
                                 <div className="relative z-10 flex flex-col items-center text-center space-y-4">

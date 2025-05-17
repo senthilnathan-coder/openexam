@@ -55,6 +55,26 @@ const Aiquestions = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  // Add file validation function
+  const validateFile = (file, type) => {
+    const maxSize = 10 * 1024 * 1024; // 10MB limit
+    if (file.size > maxSize) {
+      toast.error(`${type} file size should be less than 10MB`);
+      return false;
+    }
+    return true;
+  };
+
+  // Update the audio file handler
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0];
+    if (file && validateFile(file, 'Audio')) {
+      setSelectedAudio(file);
+    } else {
+      e.target.value = null;
+    }
+  };
+
   const handleGenerate = async () => {
     if (!formData.topic && !selectedImage && !selectedAudio && !selectedVideo) {
       toast.error('Please enter a topic or upload media content');
@@ -67,10 +87,16 @@ const Aiquestions = () => {
     formDataToSend.append('question_type', formData.questionType);
     formDataToSend.append('count', formData.count.toString());
 
-    // Append media files if they exist
-    if (selectedImage) formDataToSend.append('image', selectedImage);
-    if (selectedAudio) formDataToSend.append('audio', selectedAudio);
-    if (selectedVideo) formDataToSend.append('video', selectedVideo);
+    // Updated file handling
+    if (selectedAudio) {
+      formDataToSend.append('audio', selectedAudio, selectedAudio.name);
+    }
+    if (selectedImage) {
+      formDataToSend.append('image', selectedImage, selectedImage.name);
+    }
+    if (selectedVideo) {
+      formDataToSend.append('video', selectedVideo, selectedVideo.name);
+    }
 
     setIsGenerating(true);
     toast.info('Generating questions... This may take a few seconds.');
@@ -79,7 +105,10 @@ const Aiquestions = () => {
       const response = await fetch('http://127.0.0.1:8000/generate_quiz/', {
         method: 'POST',
         body: formDataToSend,
-        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          // Don't set Content-Type header when sending FormData
+        },
       });
 
       // First check if response is ok before parsing JSON
@@ -188,7 +217,7 @@ const Aiquestions = () => {
                   <input
                     type="file"
                     accept="audio/*"
-                    onChange={(e) => setSelectedAudio(e.target.files[0])}
+                    onChange={handleAudioChange}
                     className="hidden"
                     id="audio-upload"
                   />
@@ -231,9 +260,9 @@ const Aiquestions = () => {
                         count: Math.min(10, Math.max(1, parseInt(e.target.value) || 10)),
                       })
                     }
-                    className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center"
+                    className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center outline-none"
                     min="1"
-                    max="20"
+                    max="10"
                   />
                 </div>
 

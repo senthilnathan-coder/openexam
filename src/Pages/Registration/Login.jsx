@@ -3,6 +3,8 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -53,7 +55,7 @@ const Login = () => {
                         setErrorMessage('Login service is unavailable. Please check if the server is running.');
                         return;
                     }
-                    
+
                     if (responseData.detail) {
                         setErrorMessage(responseData.detail);
                     } else if (responseData.error) {
@@ -155,6 +157,19 @@ const Login = () => {
                             Sign up
                         </Link>
                     </p>
+                    <div className='flex justify-center items-center '>
+                        <GoogleLogin
+                            onSuccess={credentialResponse => {
+                                const decoded = jwtDecode(credentialResponse.credential);
+                                console.log(decoded);
+                                console.log(credentialResponse);
+                            }}
+                            onError={() => {
+                                console.log('Login Failed');
+                            }}
+                        />
+                    </div>
+
                 </form>
             </div>
         </div>

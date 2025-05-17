@@ -5,6 +5,7 @@ import { TbBrandOpenai } from 'react-icons/tb';
 import { MdEmail } from 'react-icons/md';
 import Scrolling from './Section_two';
 import Section_two from './Section_two';
+import { FaRobot } from 'react-icons/fa';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -19,10 +20,10 @@ const Home = () => {
                 {/* Hero Section */}
                 <div className="text-center mb-16  ">
                     <div className="flex justify-center mb-8">
-                        <TbBrandOpenai className="text-7xl text-blue-500 animate-pulse" />
+                        <FaRobot className="w-20 h-20 text-purple-400 mx-auto mb-4 animate-pulse" />
                     </div>
                     <h1 className="text-4xl sm:text-6xl font-bold text-white mb-6 ">
-                        DigiAiquest<br />
+                        DigiAiQuest<br />
                         <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text ">
                             AI-Powered Question Generator
                         </span>

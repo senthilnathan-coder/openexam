@@ -106,8 +106,8 @@ const UserDashboard = () => {
             <AreaChart data={dashboardData.progressData}>
               <defs>
                 <linearGradient id="progressColor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.9}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                  <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.9} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.2} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff15" />
@@ -225,7 +225,7 @@ const UserDashboard = () => {
               <div className="flex items-center gap-2">
                 <span>Top</span>
                 <span className="text-white font-bold">
-                  {Math.round((dashboardData.leaderboard.rank/dashboardData.leaderboard.totalUsers) * 100)}%
+                  {Math.round((dashboardData.leaderboard.rank / dashboardData.leaderboard.totalUsers) * 100)}%
                 </span>
                 <span>of users</span>
               </div>
@@ -289,8 +289,8 @@ const UserDashboard = () => {
             <BarChart data={dashboardData.savedQuizzes}>
               <defs>
                 <linearGradient id="barColor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#818cf8" stopOpacity={0.9}/>
-                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.6}/>
+                  <stop offset="0%" stopColor="#818cf8" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.6} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff15" />
@@ -329,12 +329,12 @@ const UserDashboard = () => {
         </motion.div>
 
         {/* Topic Distribution Pie Chart */}
-        <motion.div 
-          variants={itemVariants} 
+        <motion.div
+          variants={itemVariants}
           className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/15 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <FaChartLine className="text-fuchsia-400 text-3xl" /> 
+            <FaChartLine className="text-fuchsia-400 text-3xl" />
             <span className="bg-gradient-to-r from-fuchsia-400 to-pink-400 text-transparent bg-clip-text">Topic Distribution</span>
           </h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -351,7 +351,7 @@ const UserDashboard = () => {
                 animationEasing="ease-out"
               >
                 {dashboardData.weakTopics.map((entry, index) => (
-                  <Cell 
+                  <Cell
                     key={`cell-${index}`}
                     fill={`hsl(${index * 90}, 70%, 65%)`}
                     stroke="rgba(255, 255, 255, 0.1)"
@@ -360,7 +360,7 @@ const UserDashboard = () => {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ 
+                contentStyle={{
                   backgroundColor: 'rgba(30, 41, 59, 0.95)',
                   border: 'none',
                   borderRadius: '12px',
@@ -394,7 +394,7 @@ const StatCard = ({ icon, title, value, subtitle, color }) => (
     whileTap={{ scale: 0.98 }}
     className={`bg-gradient-to-r ${color} rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300`}
   >
-    <motion.div 
+    <motion.div
       className="flex items-center text-white/90 mb-2"
       whileHover={{ scale: 1.1 }}
       transition={{ type: "spring", stiffness: 400 }}
@@ -402,7 +402,7 @@ const StatCard = ({ icon, title, value, subtitle, color }) => (
       {icon}
     </motion.div>
     <h3 className="text-white text-lg font-semibold tracking-wide">{title}</h3>
-    <motion.p 
+    <motion.p
       className="text-white text-3xl font-bold mt-2"
       initial={{ scale: 0.5, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
@@ -415,5 +415,4 @@ const StatCard = ({ icon, title, value, subtitle, color }) => (
 );
 
 export default UserDashboard;
-          
-                
+
