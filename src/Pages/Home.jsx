@@ -16,7 +16,7 @@ const Home = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 mt-10">
-            <div className="px-4 py-20 max-w-7xl mx-auto ">
+            <div className="px-4 py-25 max-w-7xl mx-auto ">
                 {/* Hero Section */}
                 <div className="text-center mb-16  ">
                     <div className="flex justify-center mb-8">

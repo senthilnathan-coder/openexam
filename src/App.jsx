@@ -12,6 +12,8 @@ import Dashboard from './Pages/Admin/Dashboard';
 import UserDashboard from './Pages/User/Dashboard';
 import PricingPlans from './Pages/Pricing/PricingPlans';
 import CustomPackageBuilder from './components/CustomPackageBuilder';
+import SuperAdminDashboard from './Pages/SuperAdmin/Admin/SuperAdminDashboard';
+import SuperDashboard from './Pages/SuperAdmin/SuperDashboard';
 
 const App = () => {
     return (
@@ -28,6 +30,7 @@ const App = () => {
                             <Route path='signup' element={<Signup />} />
                             <Route path='dashboard' element={<Dashboard />} />
                             <Route path='userdashboard' element={<UserDashboard />} />
+                            <Route path='superadmin' element={<SuperDashboard />} />
                             <Route path='PricingPlans' element={<PricingPlans />} />
                             <Route path='CustomPackageBuilder' element={<CustomPackageBuilder />} />
                             <Route path='SubscriptionProvider' element={<SubscriptionProvider />} />

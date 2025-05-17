@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line } from 'recharts';
 
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     questionsUploaded: 0,
@@ -75,10 +76,10 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-slate-900 to-purple-900 p-3 sm:p-4 md:p-6 mt-23 sm:mt-20">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-r from-slate-900 to-purple-900 p-3 sm:p-4 md:p-6  sm:mt-20">
+      <div className="max-w-7xl mx-auto mt-8">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0 ">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Admin Dashboard</h1>
             <p className="text-purple-200 mt-1 sm:mt-2">Welcome back, Admin</p>

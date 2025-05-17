@@ -3,7 +3,7 @@ import { TbBrandOpenai } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
 import { FaUserCog, FaGlobe, FaCheck } from 'react-icons/fa';
 import Select from 'react-select';
-import company from "../assets/DigiAiQuest.png";
+import company from "../assets/Logo.png";
 import { FaSignInAlt } from 'react-icons/fa';
 
 
@@ -119,13 +119,13 @@ const Header = () => {
 
     return (
         <div className='bg-gradient-to-r from-gray-900 to-gray-800 px-4 sm:px-6 py-4 fixed w-full top-0 z-50'>
-            <div className='max-w-7xl mx-auto'>
-                <div className='flex justify-between items-center backdrop-blur-lg bg-white/10 rounded-2xl p-2'>
-                    <div className='flex items-center gap-2 cursor-pointer px-3' onClick={() => navigate('/')}>
-                        <img src={company} alt='Logo' className="text-blue-500 w-[60px]" />
+            <div className='max-w-12/12 mx-auto'>
+                <div className='flex justify-between items-center backdrop-blur-lg bg-white/10 rounded '>
+                    <div className='flex items-center  cursor-pointer ' onClick={() => navigate('/')}>
+                        <img src={company} alt='Logo' className="text-blue-500 w-35 h-23 " />
                     </div>
 
-                    <div className='flex items-center gap-4 justify-center'>
+                    <div className='flex items-center gap-4 justify-center px-4'>
                         <div className="relative bottom-3">
                             <Select
                                 className='text-white/80 '
