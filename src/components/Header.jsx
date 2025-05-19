@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { TbBrandOpenai } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
-import { FaUserCog, FaGlobe, FaCheck } from 'react-icons/fa';
+import { FaUserCircle, FaGlobe, FaCheck, FaSignOutAlt, FaTachometerAlt, FaSignInAlt } from 'react-icons/fa';
 import Select from 'react-select';
 import company from "../assets/Logo.png";
-import { FaSignInAlt } from 'react-icons/fa';
-
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
     const navigate = useNavigate();
+    const { user, logout } = useAuth();
     const [selectedCountry, setSelectedCountry] = useState({ value: 'US', label: '🇺🇸 English (US)' });
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     const countryOptions = [
         { value: 'US', label: '🇺🇸 English (US)', region: 'North America' },
@@ -117,10 +118,15 @@ const Header = () => {
         return acc;
     }, []);
 
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
+    };
+
     return (
         <div className='bg-gradient-to-r from-gray-900 to-gray-800 px-4 sm:px-6 py-4 fixed w-full top-0 z-50'>
             <div className='max-w-12/12 mx-auto'>
-                <div className='flex justify-between items-center backdrop-blur-lg bg-white/10 rounded '>
+                <div className='flex justify-between items-center backdrop-blur-lg bg-white/10 rounded'>
                     <div className='flex items-center  cursor-pointer ' onClick={() => navigate('/')}>
                         <img src={company} alt='Logo' className="text-blue-500 w-35 h-23 " />
                     </div>
@@ -153,16 +159,56 @@ const Header = () => {
                                 }}
                             />
                         </div>
-                        <button
-                            onClick={() => navigate('/login')}
-                            className="cursor-pointer flex items-center justify-center gap-2 
-               bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-600 hover:to-blue-600
-               text-white font-semibold px-5 py-2.5 rounded-2xl shadow-lg 
-               hover:scale-105 transition-transform duration-300 ease-in-out"
-                        >
-                            <FaSignInAlt className="text-lg" />
-                            Login
-                        </button>
+                        
+                        {user ? (
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                    className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl hover:bg-white/20 transition-all duration-200"
+                                >
+                                    {user.profile ? (
+                                        <img 
+                                            src={user.profile} 
+                                            alt="Profile" 
+                                            className="w-8 h-8 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <FaUserCircle className="text-2xl text-white/80" />
+                                    )}
+                                    <span className="text-white/80">{user.full_name}</span>
+                                </button>
+
+                                {showProfileMenu && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-xl shadow-lg py-1 border border-white/10">
+                                        <button
+                                            onClick={() => navigate('/userdashboard')}
+                                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left"
+                                        >
+                                            <FaTachometerAlt />
+                                            Dashboard
+                                        </button>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left"
+                                        >
+                                            <FaSignOutAlt />
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => navigate('/login')}
+                                className="cursor-pointer flex items-center justify-center gap-2 
+                                bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-600 hover:to-blue-600
+                                text-white font-semibold px-5 py-2.5 rounded-2xl shadow-lg 
+                                hover:scale-105 transition-transform duration-300 ease-in-out"
+                            >
+                                <FaSignInAlt className="text-lg" />
+                                Login
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

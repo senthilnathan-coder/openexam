@@ -24,19 +24,25 @@ const App = () => {
                         <Route path='/' element={<MainLayout />}>
                             <Route index element={<Navigate to="/home" />} />
                             <Route path='home' element={<Home />} />
-                            
+
                             {/* Authentication Routes */}
                             <Route path='login' element={<Login />} />
                             <Route path='signup' element={<Signup />} />
-                            <Route path='dashboard' element={<Dashboard />} />
+                            {/* <Route path='dashboard' element={<Dashboard />} />
                             <Route path='userdashboard' element={<UserDashboard />} />
-                            <Route path='superadmin' element={<SuperDashboard />} />
+                            <Route path='superadmin' element={<SuperDashboard />} /> */}
                             <Route path='PricingPlans' element={<PricingPlans />} />
                             <Route path='CustomPackageBuilder' element={<CustomPackageBuilder />} />
                             <Route path='SubscriptionProvider' element={<SubscriptionProvider />} />
-                            
+
                             {/* AI and Interactive Routes */}
-                            <Route path='ai-questions' element={<Aiquestions/>} />
+                            <Route path='ai-questions' element={<Aiquestions />} />
+                        </Route>
+
+                        <Route>
+                            <Route path='dashboard' element={<Dashboard />} />
+                            <Route path='userdashboard' element={<UserDashboard />} />
+                            <Route path='superadmin' element={<SuperDashboard />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>

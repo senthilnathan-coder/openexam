@@ -1,30 +1,30 @@
 import React from 'react';
 import { FaLinkedin, FaYoutube, FaTwitter, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { TbBrandOpenai } from "react-icons/tb";
-import company from "../assets/DigiAiQuest.png"
+import company from "../assets/Logo.png";
 
 const socialLinks = [
-    { 
-        icon: <FaLinkedin size={20} />, 
-        path: '/', 
+    {
+        icon: <FaLinkedin size={20} />,
+        path: '/',
         label: 'LinkedIn',
         color: 'hover:text-blue-500 hover:bg-blue-500/10'
     },
-    { 
-        icon: <FaYoutube size={20} />, 
-        path: '/', 
+    {
+        icon: <FaYoutube size={20} />,
+        path: '/',
         label: 'YouTube',
         color: 'hover:text-red-500 hover:bg-red-500/10'
     },
-    { 
-        icon: <FaTwitter size={20} />, 
-        path: '/', 
+    {
+        icon: <FaTwitter size={20} />,
+        path: '/',
         label: 'Twitter',
         color: 'hover:text-sky-500 hover:bg-sky-500/10'
     },
-    { 
-        icon: <FaFacebook size={20} />, 
-        path: '/', 
+    {
+        icon: <FaFacebook size={20} />,
+        path: '/',
         label: 'Facebook',
         color: 'hover:text-blue-600 hover:bg-blue-600/10'
     }
@@ -38,10 +38,10 @@ const Footer = () => {
                     {/* Brand Section */}
                     <div className="space-y-6">
                         <div className="flex items-center group cursor-pointer">
-                            <img 
-                                src={company} 
-                                alt='Logo' 
-                                className="w-[140px] transition-all duration-300 group-hover:scale-105" 
+                            <img
+                                src={company}
+                                alt='Logo'
+                                className="text-4xl transition-all duration-300 group-hover:scale-105"
                             />
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
@@ -71,8 +71,8 @@ const Footer = () => {
                     <div className="space-y-6">
                         <h3 className="text-white text-xl font-semibold">Contact Us</h3>
                         <div className="space-y-4">
-                            <a 
-                                href="mailto:info@digiquestai.com" 
+                            <a
+                                href="mailto:info@digiquestai.com"
                                 className="flex items-center gap-3 text-gray-400 group"
                             >
                                 <span className="p-2 rounded-lg bg-blue-500/10 text-blue-500
@@ -83,8 +83,8 @@ const Footer = () => {
                                     info@digiquestai.com
                                 </span>
                             </a>
-                            <a 
-                                href="tel:+919965480680" 
+                            <a
+                                href="tel:+919965480680"
                                 className="flex items-center gap-3 text-gray-400 group"
                             >
                                 <span className="p-2 rounded-lg bg-green-500/10 text-green-500
