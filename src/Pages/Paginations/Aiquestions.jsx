@@ -123,41 +123,33 @@ const Aiquestions = () => {
     }
 
     const formDataToSend = new FormData();
-    
+
     // Add text content if provided
     if (formData.topic) {
-      formDataToSend.append('text_content', formData.topic);
+      formDataToSend.append('content', formData.topic);
     }
 
-    // Add all file types
+    // Add all file types with proper field names
     if (selectedImage) {
-      formDataToSend.append('image', selectedImage);
+      formDataToSend.append('image_file', selectedImage);
     }
     if (selectedAudio) {
-      formDataToSend.append('audio', selectedAudio);
+      formDataToSend.append('audio_file', selectedAudio);
     }
     if (selectedVideo) {
-      formDataToSend.append('video', selectedVideo);
+      formDataToSend.append('video_file', selectedVideo);
     }
     if (selectedPdf) {
-      formDataToSend.append('pdf', selectedPdf);
+      formDataToSend.append('pdf_file', selectedPdf);
     }
     if (selectedWord) {
-      formDataToSend.append('word', selectedWord);
+      formDataToSend.append('word_file', selectedWord);
     }
     if (selectedExcel) {
-      formDataToSend.append('excel', selectedExcel);
+      formDataToSend.append('excel_file', selectedExcel);
     }
     if (selectedPpt) {
-      formDataToSend.append('ppt', selectedPpt);
-    }
-
-    // Add URL and Wikipedia content if provided
-    if (formData.url) {
-      formDataToSend.append('url', formData.url);
-    }
-    if (formData.wikipediaTitle) {
-      formDataToSend.append('wikipedia', formData.wikipediaTitle);
+      formDataToSend.append('ppt_file', selectedPpt);
     }
 
     // Add quiz settings
@@ -308,9 +300,6 @@ const Aiquestions = () => {
                   </label>
                 </div>
               </div>
-
-
-
               {/* Enhanced File Upload Grid */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {/* Existing uploads */}
