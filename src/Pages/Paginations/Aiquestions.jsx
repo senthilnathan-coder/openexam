@@ -123,21 +123,47 @@ const Aiquestions = () => {
     }
 
     const formDataToSend = new FormData();
-    formDataToSend.append('content', formData.topic);
+    
+    // Add text content if provided
+    if (formData.topic) {
+      formDataToSend.append('text_content', formData.topic);
+    }
+
+    // Add all file types
+    if (selectedImage) {
+      formDataToSend.append('image', selectedImage);
+    }
+    if (selectedAudio) {
+      formDataToSend.append('audio', selectedAudio);
+    }
+    if (selectedVideo) {
+      formDataToSend.append('video', selectedVideo);
+    }
+    if (selectedPdf) {
+      formDataToSend.append('pdf', selectedPdf);
+    }
+    if (selectedWord) {
+      formDataToSend.append('word', selectedWord);
+    }
+    if (selectedExcel) {
+      formDataToSend.append('excel', selectedExcel);
+    }
+    if (selectedPpt) {
+      formDataToSend.append('ppt', selectedPpt);
+    }
+
+    // Add URL and Wikipedia content if provided
+    if (formData.url) {
+      formDataToSend.append('url', formData.url);
+    }
+    if (formData.wikipediaTitle) {
+      formDataToSend.append('wikipedia', formData.wikipediaTitle);
+    }
+
+    // Add quiz settings
     formDataToSend.append('difficulty', formData.difficulty);
     formDataToSend.append('question_type', formData.questionType);
     formDataToSend.append('count', formData.count.toString());
-
-    // Updated file handling
-    if (selectedAudio) {
-      formDataToSend.append('audio', selectedAudio, selectedAudio.name);
-    }
-    if (selectedImage) {
-      formDataToSend.append('image', selectedImage, selectedImage.name);
-    }
-    if (selectedVideo) {
-      formDataToSend.append('video', selectedVideo, selectedVideo.name);
-    }
 
     setIsGenerating(true);
     toast.info('Generating questions... This may take a few seconds.');
@@ -146,10 +172,6 @@ const Aiquestions = () => {
       const response = await fetch('http://127.0.0.1:8000/generate_quiz/', {
         method: 'POST',
         body: formDataToSend,
-        headers: {
-          'Accept': 'application/json',
-          // Don't set Content-Type header when sending FormData
-        },
       });
 
       // First check if response is ok before parsing JSON
