@@ -287,6 +287,8 @@ const Aiquestions = () => {
                 </div>
               </div>
 
+
+
               {/* Enhanced File Upload Grid */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {/* Existing uploads */}
@@ -343,6 +345,52 @@ const Aiquestions = () => {
                       text-white placeholder-purple-200/50 focus:outline-none focus:border-purple-500"
                   />
                   <FaWikipediaW className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 text-lg" />
+                </div>
+              </div>
+
+              {/* Questions Count Input */}
+
+              <div className="flex items-center justify-between space-x-4 mb-4">
+                <div className="flex items-center space-x-4">
+                  <label className="text-purple-200">Questions:</label>
+                  <input
+                    type="number"
+                    value={formData.count}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        count: Math.min(10, Math.max(1, parseInt(e.target.value) || 10)),
+                      })
+                    }
+                    className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center outline-none"
+                    min="1"
+                    max="10"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <label className="text-purple-200">Difficulty:</label>
+                  <select
+                    value={formData.difficulty}
+                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                    className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white focus:outline-none cursor-pointer"
+                  >
+                    <option className='text-blue-500' value="easy">Easy</option>
+                    <option className='text-blue-500' value="medium">Medium</option>
+                    <option className='text-blue-500' value="hard">Hard</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <label className="text-purple-200">Type:</label>
+                  <select
+                    value={formData.questionType}
+                    onChange={(e) => setFormData({ ...formData, questionType: e.target.value })}
+                    className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white focus:outline-none cursor-pointer"
+                  >
+                    <option className='text-blue-500' value="mcq">Multiple Choice</option>
+                    <option className='text-blue-500' value="true_false">True/False</option>
+                  </select>
                 </div>
               </div>
 
