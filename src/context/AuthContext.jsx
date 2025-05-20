@@ -8,27 +8,42 @@ export const AuthProvider = ({ children }) => {
         return savedUser ? JSON.parse(savedUser) : null;
     });
     const [loading, setLoading] = useState(false);
+    const [dashboardData, setDashboardData] = useState(null);
 
+    // Move login function before the value object
     const login = async (email, password) => {
         setLoading(true);
         try {
-            // Clear any existing user data first
             localStorage.removeItem('user');
             setUser(null);
 
-            const mockUser = {
-                id: Date.now().toString(), // Unique ID for each login
-                email: email,
-                full_name: email.split('@')[0],
-                profile: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=random&size=200`,
-                role: 'user',
+            const response = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+
+            const data = await response.json();
+            const userData = {
+                id: data.user.id,
+                email: data.user.email,
+                full_name: data.user.full_name || email.split('@')[0],
+                profile: data.user.profile || `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=random&size=200`,
+                role: data.user.role || 'user',
                 lastLogin: new Date().toISOString()
             };
-            
-            // Set new user data
-            localStorage.setItem('user', JSON.stringify(mockUser));
-            setUser(mockUser);
-            return { success: true, user: mockUser };
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+            return { success: true, user: userData };
         } catch (error) {
             console.error('Login error:', error);
             return { success: false, error: error.message };
@@ -37,33 +52,73 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Move logout function before the value object
     const logout = async () => {
         try {
-            localStorage.clear(); // Clear all storage instead of just user
+            const token = localStorage.getItem('token');
+            // Clear storage first for immediate feedback
+            localStorage.clear();
             setUser(null);
+
+            const response = await fetch('http://127.0.0.1:8000/api/auth/logout/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Logout failed');
+            }
+
             return { success: true };
         } catch (error) {
             console.error('Logout error:', error);
-            return { success: false, error: error.message };
+            // Even if server logout fails, ensure local logout succeeds
+            localStorage.clear();
+            setUser(null);
+            return { success: true };
         }
     };
 
-    // Force update user state when localStorage changes
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const savedUser = localStorage.getItem('user');
-            setUser(savedUser ? JSON.parse(savedUser) : null);
-        };
+    // Move fetchDashboardData before the value object
+    const fetchDashboardData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token || !user) return null;
 
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
-    }, []);
+            const response = await fetch(`http://127.0.0.1:8000/api/dashboard/${user.id}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
 
+            if (!response.ok) {
+                throw new Error('Failed to fetch dashboard data');
+            }
+
+            const data = await response.json();
+            setDashboardData(data);
+            return data;
+        } catch (error) {
+            console.error('Dashboard fetch error:', error);
+            return null;
+        }
+    };
+
+    // Move value object to the end
     const value = {
         user,
         loading,
+        dashboardData,
         login,
         logout,
+        fetchDashboardData,
         isAuthenticated: !!user,
     };
 

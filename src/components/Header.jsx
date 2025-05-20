@@ -12,6 +12,16 @@ const Header = () => {
     const [selectedCountry, setSelectedCountry] = useState({ value: 'US', label: '🇺🇸 English (US)' });
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
+    // Add handleDashboardClick function
+    const handleDashboardClick = () => {
+        if (user) {
+            setShowProfileMenu(false);
+            navigate('userdashboard');
+        } else {
+            navigate('/login');
+        }
+    };
+
     const countryOptions = [
         { value: 'US', label: '🇺🇸 English (US)', region: 'North America' },
         { value: 'GB', label: '🇬🇧 English (UK)', region: 'Europe' },
@@ -168,9 +178,12 @@ const Header = () => {
                                 >
                                     {user.profile ? (
                                         <img 
-                                            src={user.profile} 
+                                            src={typeof user.profile === 'string' ? user.profile : user.profile.toString()} 
                                             alt="Profile" 
                                             className="w-8 h-8 rounded-full object-cover"
+                                            onError={(e) => {
+                                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=random&size=200`;
+                                            }}
                                         />
                                     ) : (
                                         <FaUserCircle className="text-2xl text-white/80" />
@@ -178,10 +191,11 @@ const Header = () => {
                                     <span className="text-white/80">{user.full_name}</span>
                                 </button>
 
+                              
                                 {showProfileMenu && (
                                     <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-xl shadow-lg py-1 border border-white/10">
                                         <button
-                                            onClick={() => navigate('/userdashboard')}
+                                            onClick={handleDashboardClick}
                                             className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left"
                                         >
                                             <FaTachometerAlt />

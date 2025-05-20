@@ -3,9 +3,12 @@ import { FaFire, FaChartLine, FaBullseye, FaTrophy, FaCoins, FaStar, FaHistory, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar } from 'recharts';
 import { toast } from 'react-toastify';
-import { AuthContext } from '../../context/AuthContext'; // Add this import
+import { AuthContext } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { FaCrown, FaBookmark, FaReceipt } from 'react-icons/fa';
 
 const UserDashboard = () => {
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [dashboardData, setDashboardData] = useState({
     streakData: { current: 0, longest: 0 },
@@ -26,23 +29,23 @@ const UserDashboard = () => {
         setLoading(true);
         const token = localStorage.getItem('token');
         if (!token) {
-          throw new Error('No authentication token found');
+          navigate('/login');
+          return;
         }
 
-        const response = await fetch(`http://127.0.0.1:8000/api/dashboard/${user.id}/`, {
+        // Updated API endpoint
+        const response = await fetch('http://localhost:8000/api/dashboard/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-          },
-          credentials: 'include'
+          }
         });
 
         if (!response.ok) {
           if (response.status === 401) {
-            // Handle unauthorized access
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            navigate('/login');
             return;
           }
           throw new Error('Failed to fetch dashboard data');
@@ -50,50 +53,46 @@ const UserDashboard = () => {
 
         const data = await response.json();
         
-        // Store dashboard data in localStorage for persistence
-        localStorage.setItem('dashboardData', JSON.stringify(data));
-        
+        // Transform backend data to match frontend structure
         setDashboardData({
           streakData: {
-            current: data.streak_info?.current_streak || 0,
-            longest: data.streak_info?.longest_streak || 0
+            current: data.streak?.current || 0,
+            longest: data.streak?.longest || 0
           },
-          progressData: data.quiz_statistics?.learning_curve || [],
-          weakTopics: data.quiz_statistics?.weak_topics || [],
+          progressData: data.progress || [],
+          weakTopics: data.weak_topics?.map(topic => ({
+            subject: topic.name,
+            score: topic.score,
+            totalAttempts: topic.attempts
+          })) || [],
           leaderboard: {
-            rank: data.points_info?.rank || 0,
-            totalUsers: data.points_info?.total_users || 0
+            rank: data.leaderboard?.rank || 0,
+            totalUsers: data.leaderboard?.total_users || 0
           },
           points: {
-            current: data.points_info?.total_points || 0,
-            monthly: data.points_info?.monthly_points || 0
+            current: data.points?.total || 0,
+            monthly: data.points?.monthly || 0
           },
           planUsage: {
-            used: data.subscription_info?.used_credits || 0,
-            total: data.subscription_info?.total_credits || 0
+            used: data.subscription?.used_credits || 0,
+            total: data.subscription?.total_credits || 0
           },
           savedQuizzes: data.saved_quizzes || [],
-          attemptHistory: data.quiz_attempts || [],
+          attemptHistory: data.attempts || [],
           referrals: {
-            count: data.referral_info?.total_referrals || 0,
-            earnings: data.referral_info?.total_earnings || 0
+            count: data.referrals?.count || 0,
+            earnings: data.referrals?.earnings || 0
           }
         });
+        
         setLoading(false);
       } catch (error) {
         console.error('Dashboard fetch error:', error);
-        // Try to load data from localStorage if fetch fails
-        const cachedData = localStorage.getItem('dashboardData');
-        if (cachedData) {
-          setDashboardData(JSON.parse(cachedData));
-        }
-        toast.error(error.message || 'Failed to load dashboard data');
+        toast.error('Failed to load dashboard data');
         setLoading(false);
       }
-    } else {
-      setLoading(false);
     }
-  }, [user]);
+  }, [user, navigate]);
 
   // Load cached data on initial mount
   useEffect(() => {
@@ -481,8 +480,8 @@ const UserDashboard = () => {
   );
 };
 
-// Enhanced StatCard component with animations
-const StatCard = ({ icon, title, value, subtitle, color }) => (
+// Quick Stats Grid - Move this inside the main return
+const StatCard = ({ icon, title, value, subtitle, color, onClick }) => (
   <motion.div
     whileHover={{ scale: 1.03, translateY: -5 }}
     whileTap={{ scale: 0.98 }}
@@ -509,4 +508,4 @@ const StatCard = ({ icon, title, value, subtitle, color }) => (
 );
 
 export default UserDashboard;
-
+  

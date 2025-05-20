@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaRobot, FaSpinner } from 'react-icons/fa';
-import { MdSettings } from 'react-icons/md';
+import { FaRobot, FaSpinner, FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaLink, FaWikipediaW } from 'react-icons/fa';
+import { MdSettings, MdCloudUpload } from 'react-icons/md';
 import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,6 +18,11 @@ const Aiquestions = () => {
   const [selectedAudio, setSelectedAudio] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
+  const [selectedPdf, setSelectedPdf] = useState(null);
+  const [selectedWord, setSelectedWord] = useState(null);
+  const [selectedExcel, setSelectedExcel] = useState(null);
+  const [selectedPpt, setSelectedPpt] = useState(null);
+
   const [questions, setQuestions] = useState([]);
   const [showQuestions, setShowQuestions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -26,6 +31,29 @@ const Aiquestions = () => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60); // 1 minutes in seconds
   const [timerActive, setTimerActive] = useState(false);
+
+  // Add FileUploadCard component
+  const FileUploadCard = ({ type, icon: Icon, accept, selected, setSelected }) => (
+    <div className="relative group">
+      <input
+        type="file"
+        accept={accept}
+        onChange={(e) => handleFileUpload(e.target.files[0], type, setSelected)}
+        className="hidden"
+        id={`${type}-upload`}
+      />
+      <label
+        htmlFor={`${type}-upload`}
+        className="block p-4 bg-white/5 border border-purple-500/30 rounded-xl 
+          text-purple-200 cursor-pointer hover:bg-white/10 transition-all"
+      >
+        <div className="flex flex-col items-center gap-2">
+          <Icon className="text-2xl" />
+          <span>{selected ? `✓ ${type} Selected` : `+ Add ${type}`}</span>
+        </div>
+      </label>
+    </div>
+  );
 
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!showResults && timeLeft > 0) { // Only allow selection if quiz is not finished and time remains
@@ -75,9 +103,22 @@ const Aiquestions = () => {
     }
   };
 
+  // Add file upload handlers
+  const handleFileUpload = (file, type, setterFunction) => {
+    if (file && validateFile(file, type)) {
+      setterFunction(file);
+      toast.success(`${type} file selected successfully`);
+    } else {
+      toast.error(`Invalid ${type} file`);
+    }
+  };
+
+  // Update handleGenerate to include new file types
   const handleGenerate = async () => {
-    if (!formData.topic && !selectedImage && !selectedAudio && !selectedVideo) {
-      toast.error('Please enter a topic or upload media content');
+    if (!formData.topic && !selectedImage && !selectedAudio && !selectedVideo &&
+      !selectedPdf && !selectedWord && !selectedExcel && !selectedPpt &&
+      !formData.url && !formData.wikipediaTitle) {
+      toast.error('Please provide some content to generate questions');
       return;
     }
 
@@ -246,51 +287,88 @@ const Aiquestions = () => {
                 </div>
               </div>
 
-              {/* Questions Count Input */}
+              {/* Enhanced File Upload Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Existing uploads */}
+                <FileUploadCard
+                  type="PDF"
+                  icon={FaFilePdf}
+                  accept=".pdf"
+                  selected={selectedPdf}
+                  setSelected={setSelectedPdf}
+                />
+                <FileUploadCard
+                  type="Word"
+                  icon={FaFileWord}
+                  accept=".doc,.docx"
+                  selected={selectedWord}
+                  setSelected={setSelectedWord}
+                />
+                <FileUploadCard
+                  type="Excel"
+                  icon={FaFileExcel}
+                  accept=".xls,.xlsx"
+                  selected={selectedExcel}
+                  setSelected={setSelectedExcel}
+                />
+                <FileUploadCard
+                  type="PowerPoint"
+                  icon={FaFilePowerpoint}
+                  accept=".ppt,.pptx"
+                  selected={selectedPpt}
+                  setSelected={setSelectedPpt}
+                />
+              </div>
 
-              <div className="flex items-center justify-between space-x-4 mb-4">
-                <div className="flex items-center space-x-4">
-                  <label className="text-purple-200">Questions:</label>
+              {/* URL and Wikipedia Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
                   <input
-                    type="number"
-                    value={formData.count}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        count: Math.min(10, Math.max(1, parseInt(e.target.value) || 10)),
-                      })
-                    }
-                    className="w-20 p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white text-center outline-none"
-                    min="1"
-                    max="10"
+                    type="url"
+                    placeholder="Enter URL to generate questions..."
+                    value={formData.url}
+                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                    className="w-full p-4 pl-12 bg-white/5 border border-purple-500/30 rounded-xl 
+                      text-white placeholder-purple-200/50 focus:outline-none focus:border-purple-500"
                   />
+                  <FaLink className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 text-lg" />
                 </div>
-
-                <div className="flex items-center space-x-4">
-                  <label className="text-purple-200">Difficulty:</label>
-                  <select
-                    value={formData.difficulty}
-                    onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                    className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white focus:outline-none cursor-pointer"
-                  >
-                    <option className='text-blue-500' value="easy">Easy</option>
-                    <option className='text-blue-500' value="medium">Medium</option>
-                    <option className='text-blue-500' value="hard">Hard</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <label className="text-purple-200">Type:</label>
-                  <select
-                    value={formData.questionType}
-                    onChange={(e) => setFormData({ ...formData, questionType: e.target.value })}
-                    className="p-2 bg-white/5 border border-purple-500/30 rounded-xl text-white focus:outline-none cursor-pointer"
-                  >
-                    <option className='text-blue-500' value="mcq">Multiple Choice</option>
-                    <option className='text-blue-500' value="true_false">True/False</option>
-                  </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter Wikipedia article title..."
+                    value={formData.wikipediaTitle}
+                    onChange={(e) => setFormData({ ...formData, wikipediaTitle: e.target.value })}
+                    className="w-full p-4 pl-12 bg-white/5 border border-purple-500/30 rounded-xl 
+                      text-white placeholder-purple-200/50 focus:outline-none focus:border-purple-500"
+                  />
+                  <FaWikipediaW className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 text-lg" />
                 </div>
               </div>
+
+              {/* Source Type Indicators */}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { condition: selectedPdf, label: 'PDF', color: 'red' },
+                  { condition: selectedWord, label: 'Word', color: 'blue' },
+                  { condition: selectedExcel, label: 'Excel', color: 'green' },
+                  { condition: selectedPpt, label: 'PowerPoint', color: 'orange' },
+                  { condition: formData.url, label: 'URL', color: 'purple' },
+                  { condition: formData.wikipediaTitle, label: 'Wikipedia', color: 'cyan' }
+                ].map((source, index) => (
+                  source.condition && (
+                    <span
+                      key={index}
+                      className={`px-3 py-1 rounded-full text-sm bg-${source.color}-500/20 
+                        text-${source.color}-300 flex items-center gap-1`}
+                    >
+                      <span>•</span>
+                      {source.label}
+                    </span>
+                  )
+                ))}
+              </div>
+
               {/* Generate Button */}
               <button
                 onClick={handleGenerate}
