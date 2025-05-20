@@ -17,12 +17,13 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
 
             const mockUser = {
-                id: Date.now().toString(), // Unique ID for each login
+                id: Date.now().toString(),
                 email: email,
                 full_name: email.split('@')[0],
                 profile: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=random&size=200`,
                 role: 'user',
-                lastLogin: new Date().toISOString()
+                lastLogin: new Date().toISOString(),
+                token: 'mock-jwt-token' // Add this for development
             };
             
             // Set new user data

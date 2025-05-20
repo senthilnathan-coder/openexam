@@ -157,7 +157,7 @@ const Login = () => {
                             Sign up
                         </Link>
                     </p>
-                    <div className='flex justify-center items-center '>
+                    {/* <div className='flex justify-center items-center '>
                         <GoogleLogin
                             onSuccess={credentialResponse => {
                                 const decoded = jwtDecode(credentialResponse.credential);
@@ -168,7 +168,7 @@ const Login = () => {
                                 console.log('Login Failed');
                             }}
                         />
-                    </div>
+                    </div> */}
 
                 </form>
             </div>

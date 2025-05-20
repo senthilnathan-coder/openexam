@@ -82,20 +82,20 @@ const Aiquestions = () => {
     }
 
     const formDataToSend = new FormData();
-    formDataToSend.append('content', formData.topic);
+    formDataToSend.append('content', formData.topic || ''); // Ensure content is never undefined
     formDataToSend.append('difficulty', formData.difficulty);
     formDataToSend.append('question_type', formData.questionType);
     formDataToSend.append('count', formData.count.toString());
 
-    // Updated file handling
-    if (selectedAudio) {
-      formDataToSend.append('audio', selectedAudio, selectedAudio.name);
+    // Updated file handling with null checks
+    if (selectedAudio instanceof File) {
+      formDataToSend.append('audio', selectedAudio);
     }
-    if (selectedImage) {
-      formDataToSend.append('image', selectedImage, selectedImage.name);
+    if (selectedImage instanceof File) {
+      formDataToSend.append('image', selectedImage);
     }
-    if (selectedVideo) {
-      formDataToSend.append('video', selectedVideo, selectedVideo.name);
+    if (selectedVideo instanceof File) {
+      formDataToSend.append('video', selectedVideo);
     }
 
     setIsGenerating(true);
@@ -105,13 +105,10 @@ const Aiquestions = () => {
       const response = await fetch('http://127.0.0.1:8000/generate_quiz/', {
         method: 'POST',
         body: formDataToSend,
-        headers: {
-          'Accept': 'application/json',
-          // Don't set Content-Type header when sending FormData
-        },
+        // Add credentials to handle CORS issues
+        credentials: 'include',
       });
 
-      // First check if response is ok before parsing JSON
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Server error response:', errorText);
@@ -120,9 +117,7 @@ const Aiquestions = () => {
 
       const data = await response.json();
 
-      // Validate the response data structure
       if (!data || !Array.isArray(data.questions)) {
-        console.error('Invalid response format:', data);
         throw new Error('Invalid response from server');
       }
 
@@ -140,7 +135,7 @@ const Aiquestions = () => {
 
     } catch (error) {
       console.error('Generation error details:', error);
-      toast.error(error.message || 'Failed to generate questions');
+      toast.error(error.message || 'Failed to generate questions. Please check your server connection.');
     } finally {
       setIsGenerating(false);
     }
