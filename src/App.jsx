@@ -1,54 +1,87 @@
 import React from 'react';
 import MainLayout from './Layout/main';
-import AuthLayout from './Layout/auth';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import ProtectedRoute from './components/shared/ProtectedRoute';
+
+// Import your components
 import Home from './Pages/Home';
-import Aiquestions from './Pages/Paginations/Aiquestions';
 import Login from './Pages/Registration/Login';
 import Signup from './Pages/Registration/Signup';
-import { SubscriptionProvider } from './contexts/SubscriptionContext';
-import { AuthProvider } from './context/AuthContext';
-import Dashboard from './Pages/Admin/Dashboard';
 import UserDashboard from './Pages/User/Dashboard';
+import Dashboard from './Pages/Admin/Dashboard';
+import SuperDashboard from './Pages/SuperAdmin/SuperDashboard';
 import PricingPlans from './Pages/Pricing/PricingPlans';
 import CustomPackageBuilder from './components/CustomPackageBuilder';
-import SuperAdminDashboard from './Pages/SuperAdmin/Admin/SuperAdminDashboard';
-import SuperDashboard from './Pages/SuperAdmin/SuperDashboard';
+import Aiquestions from './Pages/Paginations/Aiquestions';
 
 const App = () => {
-    return (
-        <React.Fragment>
-            <AuthProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path='/' element={<MainLayout />}>
-                            <Route index element={<Navigate to="/home" />} />
-                            <Route path='home' element={<Home />} />
+  return (
+    <AuthProvider>
+      <SubscriptionProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Navigate to="/home" />} />
+              <Route path="home" element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+              <Route path="pricing" element={<PricingPlans />} />
+            </Route>
 
-                            {/* Authentication Routes */}
-                            <Route path='login' element={<Login />} />
-                            <Route path='signup' element={<Signup />} />
-                            {/* <Route path='dashboard' element={<Dashboard />} />
-                            <Route path='userdashboard' element={<UserDashboard />} />
-                            <Route path='superadmin' element={<SuperDashboard />} /> */}
-                            <Route path='PricingPlans' element={<PricingPlans />} />
-                            <Route path='CustomPackageBuilder' element={<CustomPackageBuilder />} />
-                            <Route path='SubscriptionProvider' element={<SubscriptionProvider />} />
+            {/* Protected Routes */}
+            <Route path="/" element={<MainLayout />}>
+              <Route
+                path="userdashboard"
+                element={
+                  <ProtectedRoute>
+                    <UserDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="superadmin"
+                element={
+                  <ProtectedRoute>
+                    <SuperDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="ai-questions"
+                element={
+                  <ProtectedRoute>
+                    <Aiquestions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="custom-package"
+                element={
+                  <ProtectedRoute>
+                    <CustomPackageBuilder />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
 
-                            {/* AI and Interactive Routes */}
-                            <Route path='ai-questions' element={<Aiquestions />} />
-                        </Route>
-
-                        <Route>
-                            <Route path='dashboard' element={<Dashboard />} />
-                            <Route path='userdashboard' element={<UserDashboard />} />
-                            <Route path='superadmin' element={<SuperDashboard />} />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
-            </AuthProvider>
-        </React.Fragment>
-    );
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </SubscriptionProvider>
+    </AuthProvider>
+  );
 };
 
 export default App;
