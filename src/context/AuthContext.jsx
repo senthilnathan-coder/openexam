@@ -83,12 +83,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Move fetchDashboardData before the value object
+    // Update the fetchDashboardData function
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token || !user) return null;
-
-            const response = await fetch(`http://127.0.0.1:8000/dashboard/${user.id}/`, {
+    
+            const response = await fetch(`http://127.0.0.1:8000/userdashboard/${user.id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -96,11 +97,11 @@ export const AuthProvider = ({ children }) => {
                 },
                 credentials: 'include'
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to fetch dashboard data');
             }
-
+    
             const data = await response.json();
             setDashboardData(data);
             return data;

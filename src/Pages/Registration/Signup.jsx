@@ -58,7 +58,7 @@ const Signup = () => {
         formData.append('password', values.password);
         formData.append('confirm_password', values.confirmPassword);
 
-        const response = await fetch('http://localhost:8000/signup/', {
+        const response = await fetch('http://localhost:8000/user/signup/', {
           method: 'POST',
           headers: { Accept: 'application/json' },
           body: formData,
