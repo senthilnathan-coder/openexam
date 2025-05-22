@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
+import { FaUser, FaQuestionCircle, FaChartLine, FaClock, FaTrophy, FaCalendar } from 'react-icons/fa';
 
 const UserDashboard = () => {
   const { user, loading: authLoading } = useAuth();  // Use loading from context
@@ -8,53 +9,38 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Add console logs to debug user data
+  console.log('Current User:', user);
+  console.log('User ID:', user?.id);
+  console.log('Local Storage User:', JSON.parse(localStorage.getItem('user')));
+
   useEffect(() => {
     if (authLoading) return;
 
     const fetchDashboard = async () => {
-      // Get user data from localStorage if not available in context
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      const currentUser = user || storedUser;
-
-      console.log('Current User Data:', currentUser); // Debug log
-
-      if (!currentUser || !currentUser._id) { // Changed back to _id
-        setError("Please log in to view your dashboard");
-        setLoading(false);
-        return;
-      }
-
       try {
-        const response = await axios.get(`http://localhost:8000/api/userdashboard/${currentUser._id}`, {
+        const userId = user?.id || JSON.parse(localStorage.getItem('user'))?.id;
+        console.log('Fetching dashboard for user ID:', userId);
+
+        if (!userId) {
+          setError("User ID not found");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:8000/userdashboard/${userId}/`, {
           headers: {
-            Authorization: `Bearer ${currentUser.access_token || currentUser.token}`, // Check both token formats
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
             "Content-Type": "application/json",
-            "Accept": "application/json"
           }
         });
 
-        console.log('API Response:', response); // Debug log
-
-        if (!response.data) {
-          throw new Error('No data received from server');
-        }
-
+        console.log('Dashboard Response:', response.data);
         setDashboardData(response.data);
         setError(null);
       } catch (error) {
         console.error('Dashboard Error:', error);
-
-        if (error.response?.status === 500) {
-          setError("Server error. Please try again later.");
-        } else if (error.response?.status === 404) {
-          setError("User dashboard not found.");
-        } else if (error.response?.status === 401) {
-          setError("Session expired. Please login again.");
-        } else {
-          setError(error.response?.data?.message || error.message || "Failed to load dashboard");
-        }
-
-        setDashboardData(null);
+        setError(error.response?.data?.error || "Failed to load dashboard");
       } finally {
         setLoading(false);
       }
@@ -111,48 +97,115 @@ const UserDashboard = () => {
     );
   }
 
+  const StatCard = ({ icon: Icon, title, value, color }) => (
+    <div className={`bg-white p-6 rounded-xl shadow-md border-l-4 ${color}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-gray-500 text-sm">{title}</p>
+          <p className="text-2xl font-bold mt-1">{value}</p>
+        </div>
+        <Icon className={`text-3xl ${color.replace('border-', 'text-')}`} />
+      </div>
+    </div>
+  );
+
+  const RecentActivity = ({ activities }) => (
+    <div className="bg-white p-6 rounded-xl shadow-md col-span-full">
+      <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+      <div className="space-y-4">
+        {activities?.map((activity, index) => (
+          <div key={index} className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg">
+            <FaCalendar className="text-blue-500" />
+            <div>
+              <p className="font-medium">{activity.action}</p>
+              <p className="text-sm text-gray-500">
+                {new Date(activity.timestamp).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Update UserProfile component to use dashboardData
+  const UserProfile = ({ userData }) => (
+    <div className="bg-white p-6 rounded-xl shadow-md col-span-full md:col-span-1">
+      <div className="flex items-center space-x-4">
+        <img
+          src={userData.user_profile?.profile_image ? `http://localhost:8000${userData.user_profile.profile_image}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.user_profile?.full_name)}`}
+          alt="Profile"
+          className="w-20 h-20 rounded-full object-cover"
+        />
+        <div>
+          <h2 className="text-xl font-semibold">{userData.user_profile?.full_name}</h2>
+          <p className="text-gray-500">{userData.user_profile?.email}</p>
+          <p className="text-sm text-gray-400">Member since {new Date(userData.user_profile?.joined_date).toLocaleDateString()}</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="p-6 md:p-10 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Welcome, {user?.full_name || user?.name || 'User'}
+          Welcome, {dashboardData?.user_profile?.full_name || 'User'}
         </h1>
-        {dashboardData && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* User Profile Card */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
-              <div className="space-y-3">
-                <p><span className="font-medium">Name:</span> {currentUser?.full_name}</p>
-                <p><span className="font-medium">Email:</span> {currentUser?.email}</p>
-                <p><span className="font-medium">Member Since:</span> {currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}</p>
-              </div>
-            </div>
 
-            {/* Dashboard Stats */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Activity Stats</h2>
-              <div className="space-y-3">
-                <p><span className="font-medium">Total Quizzes:</span> {dashboardData.total_quizzes || 0}</p>
-                <p><span className="font-medium">Completed Quizzes:</span> {dashboardData.completed_quizzes || 0}</p>
-                <p><span className="font-medium">Average Score:</span> {dashboardData.average_score || 0}%</p>
-              </div>
-            </div>
+        {dashboardData && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Stats Overview */}
+            <StatCard
+              icon={FaQuestionCircle}
+              title="Total Questions Attempted"
+              value={dashboardData.quiz_stats?.total_attempts || 0}
+              color="border-blue-500"
+            />
+            <StatCard
+              icon={FaTrophy}
+              title="Best Score"
+              value={`${dashboardData.quiz_stats?.best_score || 0}%`}
+              color="border-green-500"
+            />
+            <StatCard
+              icon={FaClock}
+              title="Average Score"
+              value={`${Math.round(dashboardData.quiz_stats?.average_score || 0)}%`}
+              color="border-purple-500"
+            />
+
+            {/* User Profile */}
+            <UserProfile userData={dashboardData} />
+
+            {/* Quiz Statistics */}
+            <QuizStats stats={{
+              total_quizzes: dashboardData.quiz_stats?.total_attempts || 0,
+              average_score: dashboardData.quiz_stats?.average_score || 0,
+              mcq_attempts: dashboardData.activity_summary?.mcq_attempts || 0,
+              true_false_attempts: dashboardData.activity_summary?.true_false_attempts || 0
+            }} />
 
             {/* Recent Activity */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-              {dashboardData.recent_activities ? (
-                <ul className="space-y-2">
-                  {dashboardData.recent_activities.map((activity, index) => (
-                    <li key={index} className="text-sm text-gray-600">
-                      {activity.description}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No recent activity</p>
-              )}
+            <RecentActivity activities={dashboardData.recent_activities || []} />
+
+            {/* Performance Chart */}
+            <div className="bg-white p-6 rounded-xl shadow-md col-span-full">
+              <h2 className="text-xl font-semibold mb-4">Performance Overview</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-yellow-50 rounded-lg">
+                  <p className="text-sm text-yellow-600">MCQ Attempts</p>
+                  <p className="text-2xl font-bold text-yellow-700">
+                    {dashboardData.activity_summary?.mcq_attempts || 0}
+                  </p>
+                </div>
+                <div className="p-4 bg-indigo-50 rounded-lg">
+                  <p className="text-sm text-indigo-600">True/False Attempts</p>
+                  <p className="text-2xl font-bold text-indigo-700">
+                    {dashboardData.activity_summary?.true_false_attempts || 0}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -162,3 +215,39 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
+
+  // Move QuizStats component before the main return statement
+  const QuizStats = ({ stats }) => (
+    <div className="bg-white p-6 rounded-xl shadow-md col-span-full md:col-span-2">
+      <h2 className="text-xl font-semibold mb-4">Quiz Statistics</h2>
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-blue-600">Total Attempts</p>
+          <p className="text-2xl font-bold text-blue-700">{stats.total_quizzes}</p>
+        </div>
+        <div className="p-4 bg-green-50 rounded-lg">
+          <p className="text-sm text-green-600">Average Score</p>
+          <p className="text-2xl font-bold text-green-700">{Math.round(stats.average_score)}%</p>
+        </div>
+        <div className="p-4 bg-yellow-50 rounded-lg">
+          <p className="text-sm text-yellow-600">MCQ Attempts</p>
+          <p className="text-2xl font-bold text-yellow-700">{stats.mcq_attempts}</p>
+        </div>
+        <div className="p-4 bg-purple-50 rounded-lg">
+          <p className="text-sm text-purple-600">True/False Attempts</p>
+          <p className="text-2xl font-bold text-purple-700">{stats.true_false_attempts}</p>
+        </div>
+      </div>
+    </div>
+  );
+
+
+
+
+
+
+
+
+
+

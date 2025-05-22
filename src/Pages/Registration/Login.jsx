@@ -5,8 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
+    const { login } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
@@ -28,68 +30,33 @@ const Login = () => {
         onSubmit: async (values, { setSubmitting }) => {
             try {
                 setErrorMessage('');
-                const response = await fetch('http://localhost:8000/user/signin/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: values.email.trim().toLowerCase(),
-                        password: values.password
-                    }),
-                });
+                const result = await login(
+                    values.email.trim().toLowerCase(),
+                    values.password
+                );
 
-                let responseData;
-                try {
-                    responseData = await response.json();
-                } catch (parseError) {
-                    console.error('Response parsing error:', parseError);
-                    setErrorMessage('Unable to process server response. Please try again.');
-                    return;
-                }
-
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        console.error('Endpoint not found:', response.status);
-                        setErrorMessage('Login service is unavailable. Please check if the server is running.');
-                        return;
-                    }
-
-                    if (responseData.detail) {
-                        setErrorMessage(responseData.detail);
-                    } else if (responseData.error) {
-                        setErrorMessage(responseData.error);
-                    } else if (responseData.message) {
-                        setErrorMessage(responseData.message);
-                    } else {
-                        setErrorMessage('Login failed. Please check your credentials and try again.');
-                    }
-                    return;
-                }
-
-                if (responseData.message === 'Login successful') {
-                    // Store user data if available
-                    if (responseData.user) {
-                        localStorage.setItem('user', JSON.stringify(responseData.user));
-                    }
+                if (result.success) {
                     navigate('/ai-questions');
                 } else {
-                    console.error('Invalid response format:', responseData);
-                    setErrorMessage(responseData.message || 'Login failed. Please try again.');
+                    setErrorMessage(result.error || 'Login failed');
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-                    setErrorMessage('Unable to connect to the server. Please check if the server is running.');
-                } else {
-                    setErrorMessage('An unexpected error occurred. Please try again later.');
-                }
+                setErrorMessage('An unexpected error occurred');
             } finally {
                 setSubmitting(false);
             }
         },
     });
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const decoded = jwtDecode(credentialResponse.credential);
+            // Implement Google login logic here
+            console.log(decoded);
+        } catch (error) {
+            setErrorMessage('Google login failed');
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-900 via-indigo-900 to-blue-900 py-12 px-4 sm:px-6 lg:px-8">

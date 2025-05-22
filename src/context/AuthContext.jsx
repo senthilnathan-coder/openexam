@@ -1,109 +1,89 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
-        const savedUser = localStorage.getItem('user');
-        return savedUser ? JSON.parse(savedUser) : null;
+        const storedAuth = localStorage.getItem('auth');
+        return storedAuth ? JSON.parse(storedAuth).user : null;
     });
     const [loading, setLoading] = useState(false);
-    const [dashboardData, setDashboardData] = useState(null);
 
-    // Move login function before the value object
     const login = async (email, password) => {
         setLoading(true);
         try {
-            localStorage.removeItem('user');
-            setUser(null);
-
-            const response = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+            const response = await fetch('http://localhost:8000/user/signin/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-                credentials: 'include'
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
             });
-
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-
             const data = await response.json();
-            const userData = {
-                id: data.user.id,
-                email: data.user.email,
-                full_name: data.user.full_name || email.split('@')[0],
-                profile: data.user.profile || `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=random&size=200`,
-                role: data.user.role || 'user',
-                lastLogin: new Date().toISOString()
-            };
-
-            localStorage.setItem('user', JSON.stringify(userData));
-            setUser(userData);
-            return { success: true, user: userData };
+            if (!response.ok) throw new Error(data.error);
+            const authData = { user: data.user, token: data.token };
+            localStorage.setItem('auth', JSON.stringify(authData));
+            setUser(data.user);
+            return { success: true, user: data.user };
         } catch (error) {
-            console.error('Login error:', error);
             return { success: false, error: error.message };
         } finally {
             setLoading(false);
         }
     };
 
-    // Move logout function before the value object
-    const logout = async () => {
+    const signup = async (formData) => {
+        setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            // Clear storage first for immediate feedback
-            localStorage.clear();
-            setUser(null);
-
-            const response = await fetch('http://127.0.0.1:8000/api/auth/logout/', {
+            const response = await fetch('http://localhost:8000/user/signup/', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+                body: formData,
                 credentials: 'include'
             });
-
-            if (!response.ok) {
-                throw new Error('Logout failed');
-            }
-
-            return { success: true };
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error);
+            const authData = { user: data.user, token: data.token };
+            localStorage.setItem('auth', JSON.stringify(authData));
+            setUser(data.user);
+            return { success: true, user: data.user };
         } catch (error) {
-            console.error('Logout error:', error);
-            // Even if server logout fails, ensure local logout succeeds
-            localStorage.clear();
-            setUser(null);
-            return { success: true };
+            return { success: false, error: error.message };
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Move fetchDashboardData before the value object
-    // Update the fetchDashboardData function
-    const fetchDashboardData = async () => {
+    const fetchUserProfile = async () => {
+        if (!user?.id) return null;
         try {
-            const token = localStorage.getItem('token');
-            if (!token || !user) return null;
-    
-            const response = await fetch(`http://127.0.0.1:8000/userdashboard/${user.id}/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
+            const response = await fetch(`http://localhost:8000/userdashboard/${user._id}/`, {
                 credentials: 'include'
             });
-    
-            if (!response.ok) {
-                throw new Error('Failed to fetch dashboard data');
-            }
-    
+            if (!response.ok) throw new Error('Failed to fetch profile');
             const data = await response.json();
-            setDashboardData(data);
+            const updatedUser = { ...user, ...data };
+            const storedAuth = JSON.parse(localStorage.getItem('auth')) || {};
+            storedAuth.user = updatedUser;
+            localStorage.setItem('auth', JSON.stringify(storedAuth));
+            setUser(updatedUser);
+            return updatedUser;
+        } catch (error) {
+            console.error('Profile fetch error:', error);
+            return null;
+        }
+    };
+
+    const fetchDashboardData = async () => {
+        if (!user?.id) return null;
+        try {
+            const token = JSON.parse(localStorage.getItem('auth'))?.token;
+            const response = await fetch(`http://localhost:8000/userdashboard/${user._id}/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            });
+            if (!response.ok) throw new Error('Failed to fetch dashboard data');
+            const data = await response.json();
             return data;
         } catch (error) {
             console.error('Dashboard fetch error:', error);
@@ -111,19 +91,13 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Move value object to the end
-    const value = {
-        user,
-        loading,
-        dashboardData,
-        login,
-        logout,
-        fetchDashboardData,
-        isAuthenticated: !!user,
+    const logout = () => {
+        localStorage.removeItem('auth');
+        setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={value}>
+        <AuthContext.Provider value={{ user, loading, login, signup, logout, fetchUserProfile, fetchDashboardData, isAuthenticated: !!user }}>
             {children}
         </AuthContext.Provider>
     );
@@ -131,8 +105,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+    if (!context) throw new Error('useAuth must be used within an AuthProvider');
     return context;
 };

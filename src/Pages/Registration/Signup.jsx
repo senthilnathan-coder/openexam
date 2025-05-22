@@ -3,9 +3,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaImage } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,28 +25,12 @@ const Signup = () => {
     },
     validationSchema: Yup.object({
       profile: Yup.mixed().required('Profile image is required'),
-      fullName: Yup.string()
-        .required('Full name is required')
-        .min(2, 'Must be at least 2 characters')
-        .max(100, 'Too long')
-        .trim(),
-      countryCode: Yup.string()
-        .required('Country code is required')
-        .matches(/^\+91$/, 'Only +91 supported'),
-      phoneNumber: Yup.string()
-        .required('Phone number is required')
-        .matches(/^[6-9]\d{9}$/, 'Must be 10 digits starting with 6-9'),
-      email: Yup.string()
-        .required('Email is required')
-        .email('Invalid email format')
-        .trim()
-        .lowercase(),
-      password: Yup.string()
-        .required('Password is required')
-        .min(8, 'At least 8 characters'),
-      confirmPassword: Yup.string()
-        .required('Please confirm your password')
-        .oneOf([Yup.ref('password'), null], 'Passwords must match')
+      fullName: Yup.string().trim().min(2, 'Must be at least 2 characters').max(100, 'Too long').required('Full name is required'),
+      countryCode: Yup.string().matches(/^\+91$/, 'Only +91 supported').required('Country code is required'),
+      phoneNumber: Yup.string().matches(/^[6-9]\d{9}$/, 'Must be 10 digits starting with 6-9').required('Phone number is required'),
+      email: Yup.string().trim().lowercase().email('Invalid email format').required('Email is required'),
+      password: Yup.string().min(8, 'At least 8 characters').required('Password is required'),
+      confirmPassword: Yup.string().oneOf([Yup.ref('password')], 'Passwords must match').required('Please confirm your password')
     }),
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       try {
@@ -58,23 +44,25 @@ const Signup = () => {
         formData.append('password', values.password);
         formData.append('confirm_password', values.confirmPassword);
 
-        const response = await fetch('http://localhost:8000/user/signup/', {
-          method: 'POST',
-          headers: { Accept: 'application/json' },
-          body: formData,
-          credentials: 'include'
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
+        const result = await signup(formData);
+        if (result.success) {
+          // Store user data including ID in localStorage
+          if (result.user) {
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem('userId', result.user.id);
+          }
+          // Add a success message before redirecting
+          toast.success('Account created successfully!');
           navigate('/login');
         } else {
-          setErrorMessage(data.error || 'Signup failed.');
-          if (data.error?.includes('phone')) setFieldError('phoneNumber', data.error);
-          if (data.error?.includes('Password')) setFieldError('password', data.error);
+          setErrorMessage(result.error || 'Signup failed');
+          // Handle specific field errors
+          if (result.error?.includes('phone')) setFieldError('phoneNumber', result.error);
+          if (result.error?.includes('email')) setFieldError('email', result.error);
+          if (result.error?.includes('Password')) setFieldError('password', result.error);
         }
       } catch (error) {
+        console.error('Signup error:', error);
         setErrorMessage('Network error. Please try again.');
       } finally {
         setSubmitting(false);
@@ -104,35 +92,25 @@ const Signup = () => {
           </div>
         )}
 
-        <form className="space-y-6" onSubmit={formik.handleSubmit}>
-          {/* Profile Image Upload */}
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {/* Profile Image */}
           <div className="text-center">
-            <div className="relative inline-block">
+            <label htmlFor="profile" className="cursor-pointer inline-block relative w-32 h-32 rounded-full overflow-hidden border-2 border-white/20 hover:border-blue-500 transition">
               <input
                 type="file"
                 id="profile"
-                name="profile"
                 accept="image/*"
                 onChange={handleProfileChange}
                 className="hidden"
               />
-              <label
-                htmlFor="profile"
-                className="cursor-pointer block w-32 h-32 rounded-full overflow-hidden border-2 border-white/20 hover:border-blue-500 transition"
-              >
-                {profilePreview ? (
-                  <img
-                    src={profilePreview}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-white/10">
-                    <FaImage className="text-4xl text-blue-200/60" />
-                  </div>
-                )}
-              </label>
-            </div>
+              {profilePreview ? (
+                <img src={profilePreview} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-white/10">
+                  <FaImage className="text-4xl text-blue-200/60" />
+                </div>
+              )}
+            </label>
             {formik.touched.profile && formik.errors.profile && (
               <p className="mt-1 text-red-400 text-sm">{formik.errors.profile}</p>
             )}
@@ -232,11 +210,11 @@ const Signup = () => {
             )}
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:shadow-lg transition"
             disabled={formik.isSubmitting}
+            className="w-full py-3 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:shadow-lg transition"
           >
             {formik.isSubmitting ? 'Creating Account...' : 'Sign Up'}
           </button>
