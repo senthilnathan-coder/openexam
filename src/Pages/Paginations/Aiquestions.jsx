@@ -115,19 +115,50 @@ const Aiquestions = () => {
 
   // Update handleGenerate to include new file types
   const handleGenerate = async () => {
-    if (!formData.topic && !selectedImage && !selectedAudio && !selectedVideo &&
-      !selectedPdf && !selectedWord && !selectedExcel && !selectedPpt &&
-      !formData.url && !formData.wikipediaTitle) {
-      toast.error('Please provide some content to generate questions');
+    // Improved validation check
+    const hasContent = Boolean(
+      formData.topic.trim() ||
+      selectedImage ||
+      selectedAudio ||
+      selectedVideo ||
+      selectedPdf ||
+      selectedWord ||
+      selectedExcel ||
+      selectedPpt ||
+      formData.url?.trim() ||
+      formData.wikipediaTitle?.trim()
+    );
+
+    if (!hasContent) {
+      toast.error('Please provide at least one type of content (text, file, or URL)');
       return;
     }
 
     const formDataToSend = new FormData();
 
     // Add text content if provided
-    if (formData.topic) {
-      formDataToSend.append('content', formData.topic);
+    if (formData.topic.trim()) {
+      formDataToSend.append('content', formData.topic.trim());
     }
+
+    // Add URL if provided
+    if (formData.url?.trim()) {
+      formDataToSend.append('url', formData.url.trim());
+    }
+
+    // Add Wikipedia title if provided
+    if (formData.wikipediaTitle?.trim()) {
+      formDataToSend.append('wikipedia_title', formData.wikipediaTitle.trim());
+    }
+
+    // Add files with proper field names
+    if (selectedImage) formDataToSend.append('image', selectedImage);
+    if (selectedAudio) formDataToSend.append('audio', selectedAudio);
+    if (selectedVideo) formDataToSend.append('video', selectedVideo);
+    if (selectedPdf) formDataToSend.append('pdf', selectedPdf);
+    if (selectedWord) formDataToSend.append('word', selectedWord);
+    if (selectedExcel) formDataToSend.append('excel', selectedExcel);
+    if (selectedPpt) formDataToSend.append('ppt', selectedPpt);
 
     // Add all file types with proper field names
     if (selectedImage) {

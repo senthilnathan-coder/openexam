@@ -217,30 +217,30 @@ const UserDashboard = () => {
 export default UserDashboard;
 
 
-  // Move QuizStats component before the main return statement
-  const QuizStats = ({ stats }) => (
-    <div className="bg-white p-6 rounded-xl shadow-md col-span-full md:col-span-2">
-      <h2 className="text-xl font-semibold mb-4">Quiz Statistics</h2>
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-600">Total Attempts</p>
-          <p className="text-2xl font-bold text-blue-700">{stats.total_quizzes}</p>
-        </div>
-        <div className="p-4 bg-green-50 rounded-lg">
-          <p className="text-sm text-green-600">Average Score</p>
-          <p className="text-2xl font-bold text-green-700">{Math.round(stats.average_score)}%</p>
-        </div>
-        <div className="p-4 bg-yellow-50 rounded-lg">
-          <p className="text-sm text-yellow-600">MCQ Attempts</p>
-          <p className="text-2xl font-bold text-yellow-700">{stats.mcq_attempts}</p>
-        </div>
-        <div className="p-4 bg-purple-50 rounded-lg">
-          <p className="text-sm text-purple-600">True/False Attempts</p>
-          <p className="text-2xl font-bold text-purple-700">{stats.true_false_attempts}</p>
-        </div>
+// Move QuizStats component before the main return statement
+const QuizStats = ({ stats }) => (
+  <div className="bg-white p-6 rounded-xl shadow-md col-span-full md:col-span-2">
+    <h2 className="text-xl font-semibold mb-4">Quiz Statistics</h2>
+    <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+      <div className="p-4 bg-blue-50 rounded-lg">
+        <p className="text-sm text-blue-600">Total Attempts</p>
+        <p className="text-2xl font-bold text-blue-700">{stats.total_quizzes}</p>
+      </div>
+      <div className="p-4 bg-green-50 rounded-lg">
+        <p className="text-sm text-green-600">Average Score</p>
+        <p className="text-2xl font-bold text-green-700">{Math.round(stats.average_score)}%</p>
+      </div>
+      <div className="p-4 bg-yellow-50 rounded-lg">
+        <p className="text-sm text-yellow-600">MCQ Attempts</p>
+        <p className="text-2xl font-bold text-yellow-700">{stats.mcq_attempts}</p>
+      </div>
+      <div className="p-4 bg-purple-50 rounded-lg">
+        <p className="text-sm text-purple-600">True/False Attempts</p>
+        <p className="text-2xl font-bold text-purple-700">{stats.true_false_attempts}</p>
       </div>
     </div>
-  );
+  </div>
+);
 
 
 
