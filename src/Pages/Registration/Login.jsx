@@ -12,6 +12,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    console.log(login, "iugi8uh");
 
     const formik = useFormik({
         initialValues: {

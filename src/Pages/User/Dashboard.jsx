@@ -241,13 +241,3 @@ const QuizStats = ({ stats }) => (
     </div>
   </div>
 );
-
-
-
-
-
-
-
-
-
-

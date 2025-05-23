@@ -4,6 +4,16 @@ import { MdSettings, MdCloudUpload } from 'react-icons/md';
 import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 
+
+import { FaRegBookmark } from 'react-icons/fa';
+import SaveQuizModal from '../../components/quiz/SaveQuizModal';
+import SavedQuizzesList from '../../components/Quiz/SavedQuizzesList';
+import { useAuth } from '../../context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
+
+
+
+
 const Aiquestions = () => {
   // Update the initial state count to 10
   const [formData, setFormData] = useState({
@@ -12,6 +22,7 @@ const Aiquestions = () => {
     difficulty: 'medium',
     questionType: 'mcq'  // Add questionType to initial state
   });
+
 
   // Add these new state variables
   const [selectedImage, setSelectedImage] = useState(null);
@@ -31,6 +42,15 @@ const Aiquestions = () => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60); // 1 minutes in seconds
   const [timerActive, setTimerActive] = useState(false);
+
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveNotes, setSaveNotes] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedQuizzes, setSavedQuizzes] = useState([]);
+
+  const [quizId, setQuizId] = useState(null);
+
+
 
   // Add FileUploadCard component
   const FileUploadCard = ({ type, icon: Icon, accept, selected, setSelected }) => (
@@ -115,6 +135,9 @@ const Aiquestions = () => {
 
   // Update handleGenerate to include new file types
   const handleGenerate = async () => {
+    // Generate a unique quiz ID locally
+    const newQuizId = uuidv4();
+    setQuizId(newQuizId);
     // Improved validation check
     const hasContent = Boolean(
       formData.topic.trim() ||
@@ -251,6 +274,71 @@ const Aiquestions = () => {
       toast.warning(`Keep practicing! Score: ${finalScore.toFixed(1)}%`);
     }
   };
+
+  // Get from your auth context or localStorage
+  const user = JSON.parse(localStorage.getItem('auth'))?.user;
+  const token = JSON.parse(localStorage.getItem('auth'))?.token;
+  // const { user } = useAuth();
+  console.log('Current user:', user);
+
+  const handleSaveQuiz = async () => {
+    if (!user || !user._id) {
+      alert('User not logged in');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      const token = JSON.parse(localStorage.getItem('auth'))?.token;
+
+      // if (!token) {
+      //   alert('Auth token missing');
+      //   setIsSaving(false);
+      //   return;
+      // }
+
+      const quizData = {
+        user_id: user._id,
+        questions,
+        selectedAnswers,
+        score,
+        date: new Date().toISOString(),
+        notes: saveNotes,
+      };
+
+      const response = await fetch(`http://127.0.0.1:8000/userdashboard/${user._Id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(quizData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Failed to save quiz');
+
+      toast.success('Quiz saved!');
+      setShowSaveModal(false);
+      setSaveNotes('');
+      setSavedQuizzes((prev) => [
+        ...prev,
+        {
+          id: data.quiz_id,
+          score,
+          date: new Date().toISOString(),
+          notes: saveNotes,
+        },
+      ]);
+    } catch (err) {
+      toast.error('Error saving quiz: ' + err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+
 
   // Update the form UI
   return (
@@ -545,7 +633,47 @@ const Aiquestions = () => {
           </div>
         )}
       </div>
+      <div className="p-6">
+        {showResults && (
+          <div className="mt-6 text-center text-white">
+            <h3 className="text-2xl font-bold">Your Score: {score.toFixed(1)}%</h3>
+            <div className="mt-4 flex justify-center space-x-4">
+              <button
+                onClick={() => setShowSaveModal(true)}
+                className="px-6 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg flex items-center space-x-2"
+              >
+                <FaRegBookmark />
+                <span>Save Quiz</span>
+              </button>
+              <button
+                onClick={() => {
+                  setShowResults(false);
+                  setQuestions([]);
+                  setSelectedAnswers([]);
+                  setScore(0);
+                }}
+                className="px-6 py-2 bg-gray-500 hover:bg-gray-600 rounded-lg"
+              >
+                New Quiz
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showSaveModal && (
+          <SaveQuizModal
+            saveNotes={saveNotes}
+            setSaveNotes={setSaveNotes}
+            setShowSaveModal={setShowSaveModal}
+            isSaving={isSaving}
+            handleSaveQuiz={handleSaveQuiz}
+          />
+        )}
+
+        <SavedQuizzesList savedQuizzes={savedQuizzes} />
+      </div>
     </div>
+
   );
 };
 
