@@ -1,14 +1,21 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    // Load user from localStorage on init
-    const [user, setUser] = useState(() => {
-        const storedAuth = localStorage.getItem('auth');
-        return storedAuth ? JSON.parse(storedAuth).user : null;
-    });
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Load user and token from localStorage on mount
+    useEffect(() => {
+        const storedAuth = localStorage.getItem('auth');
+        if (storedAuth) {
+            const parsedAuth = JSON.parse(storedAuth);
+            setUser(parsedAuth.user);
+            setToken(parsedAuth.token);
+        }
+    }, []);
 
     // Login function
     const login = async (email, password) => {
@@ -24,20 +31,21 @@ export const AuthProvider = ({ children }) => {
 
             if (!response.ok) throw new Error(data.error || 'Login failed');
 
-            // Store user and token in localStorage
             const authData = { user: data.user, token: data.token };
             localStorage.setItem('auth', JSON.stringify(authData));
             setUser(data.user);
+            setToken(data.token);
 
             return { success: true, user: data.user };
         } catch (error) {
+            console.error('Login error:', error.message);
             return { success: false, error: error.message };
         } finally {
             setLoading(false);
         }
     };
 
-    // Signup function (accepts FormData for profile image upload)
+    // Signup function
     const signup = async (formData) => {
         setLoading(true);
         try {
@@ -50,47 +58,58 @@ export const AuthProvider = ({ children }) => {
 
             if (!response.ok) throw new Error(data.error || 'Signup failed');
 
-            // Store user and token
             const authData = { user: data.user, token: data.token };
             localStorage.setItem('auth', JSON.stringify(authData));
             setUser(data.user);
+            setToken(data.token);
 
             return { success: true, user: data.user };
         } catch (error) {
+            console.error('Signup error:', error.message);
             return { success: false, error: error.message };
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch updated user profile data
+    // Fetch user dashboard/profile data
     const fetchUserProfile = async () => {
         if (!user?._id) return null;
         try {
-            const response = await fetch(`http://localhost:8000/userdashboard/${user._id}/`);
+            const response = await fetch(`http://localhost:8000/userdashboard/${user._id}/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
             if (!response.ok) throw new Error('Failed to fetch profile');
+
             const data = await response.json();
+
             const updatedUser = { ...user, ...data.user };
-            // Update localStorage and context state
-            localStorage.setItem('auth', JSON.stringify({ user: updatedUser, token: JSON.parse(localStorage.getItem('auth')).token }));
             setUser(updatedUser);
+
+            localStorage.setItem('auth', JSON.stringify({ user: updatedUser, token }));
+
             return updatedUser;
         } catch (error) {
-            console.error('Profile fetch error:', error);
+            console.error('Profile fetch error:', error.message);
             return null;
         }
     };
 
-    // Logout function
+    // Logout
     const logout = () => {
         localStorage.removeItem('auth');
         setUser(null);
+        setToken(null);
     };
 
     return (
         <AuthContext.Provider
             value={{
                 user,
+                token,
                 loading,
                 login,
                 signup,
@@ -104,9 +123,11 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Hook for easier context usage
+// Hook to use Auth context
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) throw new Error('useAuth must be used within an AuthProvider');
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
     return context;
 };

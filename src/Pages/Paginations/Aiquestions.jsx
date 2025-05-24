@@ -306,8 +306,8 @@ const Aiquestions = () => {
         notes: saveNotes,
       };
 
-      const response = await fetch(`http://127.0.0.1:8000/userdashboard/${user._Id}`, {
-        method: 'POST',
+      const response = await fetch(`http://127.0.0.1:8000/userdashboard/${quizData.user_id}/`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
