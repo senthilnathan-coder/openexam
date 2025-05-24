@@ -636,7 +636,7 @@ const Aiquestions = () => {
       <div className="p-6">
         {showResults && (
           <div className="mt-6 text-center text-white">
-            <h3 className="text-2xl font-bold">Your Score: {score.toFixed(1)}%</h3>
+            {/* <h3 className="text-2xl font-bold">Your Score: {score.toFixed(1)}%</h3> */}
             <div className="mt-4 flex justify-center space-x-4">
               <button
                 onClick={() => setShowSaveModal(true)}
@@ -660,7 +660,7 @@ const Aiquestions = () => {
           </div>
         )}
 
-        {showSaveModal && (
+        {/* {showSaveModal && (
           <SaveQuizModal
             saveNotes={saveNotes}
             setSaveNotes={setSaveNotes}
@@ -668,9 +668,9 @@ const Aiquestions = () => {
             isSaving={isSaving}
             handleSaveQuiz={handleSaveQuiz}
           />
-        )}
+        )} */}
 
-        <SavedQuizzesList savedQuizzes={savedQuizzes} />
+        {/* <SavedQuizzesList savedQuizzes={savedQuizzes} /> */}
       </div>
     </div>
 

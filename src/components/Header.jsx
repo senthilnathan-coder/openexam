@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import {
   FaUserCircle,
   FaGlobe,
@@ -20,6 +20,7 @@ const Header = () => {
     label: '🇺🇸 English (US)',
   });
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef(null);
 
   const countryOptions = [
     { value: 'US', label: '🇺🇸 English (US)', region: 'North America' },
@@ -38,6 +39,22 @@ const Header = () => {
     return acc;
   }, []);
 
+  // Close profile menu on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    }
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileMenu]);
+
+  // Custom react-select styles
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -46,9 +63,20 @@ const Header = () => {
       boxShadow: 'none',
       cursor: 'pointer',
       minHeight: 'unset',
-      width: '40px',
+      width: 'auto',
+      paddingLeft: '0',
+      paddingRight: '0',
+      display: 'flex',
+      alignItems: 'center',
+      color: 'white',
     }),
-    dropdownIndicator: () => ({ display: 'none' }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: 0,
+      paddingRight: 6,
+      color: 'white',
+      '&:hover': { color: 'white' },
+    }),
     indicatorSeparator: () => ({ display: 'none' }),
     menu: (base) => ({
       ...base,
@@ -57,12 +85,15 @@ const Header = () => {
       borderRadius: '1rem',
       padding: '0.5rem',
       width: '250px',
+      color: 'white',
+      zIndex: 9999,
     }),
     group: (base) => ({
       ...base,
       padding: '0.5rem 0',
-      '&:not(:last-child)': {
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      '&:last-child': {
+        borderBottom: 'none',
       },
     }),
     groupHeading: (base) => ({
@@ -73,6 +104,7 @@ const Header = () => {
       letterSpacing: '0.05em',
       marginBottom: '0.5rem',
       textTransform: 'uppercase',
+      paddingLeft: '10px',
     }),
     option: (base, state) => ({
       ...base,
@@ -92,9 +124,28 @@ const Header = () => {
     }),
     singleValue: (base) => ({
       ...base,
-      color: 'rgba(255, 255, 255, 0.8)',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.3rem',
     }),
   };
+
+  // Custom DropdownIndicator to only show the globe icon
+  const DropdownIndicator = (props) => (
+    <div className=' flex relative top-3'>
+      <components.DropdownIndicator {...props}>
+        <FaGlobe size={18} className="text-white" />
+      </components.DropdownIndicator>
+    </div>
+  );
+
+  // Custom SingleValue to show flag and label nicely
+  const SingleValue = ({ data }) => (
+    <div className="flex items-center gap-1 text-white select-none">
+      <span>{data.label}</span>
+    </div>
+  );
 
   const handleLogout = async () => {
     await logout();
@@ -111,39 +162,28 @@ const Header = () => {
           <img src={company} alt="Logo" className="w-32 h-auto" />
         </div>
 
-        <div className="flex items-center gap-4 justify-center px-4">
+        <div className="flex items-center gap-6 justify-center px-4">
           {/* Language Selector */}
-          <div className="relative bottom-3">
+          <div className="w-auto">
             <Select
-              className="text-white/80"
+              className="text-white relative bottom-3"
               options={groupedOptions}
               styles={customStyles}
               isSearchable={false}
               value={selectedCountry}
               onChange={(option) => setSelectedCountry(option)}
-              components={{
-                SingleValue: () => (
-                  <FaGlobe
-                    size={22}
-                    className="text-white/80 hover:text-white transition-colors duration-200"
-                  />
-                ),
-                Option: ({ data, isSelected, ...props }) => (
-                  <div {...props} className="flex items-center justify-between">
-                    <span>{data.label}</span>
-                    {isSelected && <FaCheck className="text-green-400" size={12} />}
-                  </div>
-                ),
-              }}
+              components={{ DropdownIndicator, SingleValue }}
             />
           </div>
 
           {/* Profile or Login Button */}
           {user ? (
-            <div className="relative">
+            <div className="relative" ref={profileMenuRef}>
               <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl hover:bg-white/20 transition-all duration-200"
+                onClick={() => setShowProfileMenu((prev) => !prev)}
+                className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+                aria-haspopup="true"
+                aria-expanded={showProfileMenu}
               >
                 {user.profile ? (
                   <img
@@ -151,8 +191,8 @@ const Header = () => {
                       typeof user.profile === 'string' && user.profile.trim() !== ''
                         ? user.profile
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            user.full_name
-                          )}&background=random&size=200`
+                          user.full_name
+                        )}&background=random&size=200`
                     }
                     alt="Profile"
                     className="w-8 h-8 rounded-full object-cover"
@@ -160,7 +200,7 @@ const Header = () => {
                 ) : (
                   <FaUserCircle className="text-2xl text-white/80" />
                 )}
-                <span className="text-white/80">{user.full_name}</span>
+                <span className="text-white/80 whitespace-nowrap">{user.full_name}</span>
               </button>
 
               {showProfileMenu && (
@@ -170,14 +210,14 @@ const Header = () => {
                       setShowProfileMenu(false);
                       navigate('/userdashboard');
                     }}
-                    className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left"
+                    className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left rounded-t-xl"
                   >
                     <FaTachometerAlt />
                     Dashboard
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left"
+                    className="flex items-center gap-2 px-4 py-2 text-white/80 hover:bg-white/10 w-full text-left rounded-b-xl"
                   >
                     <FaSignOutAlt />
                     Logout

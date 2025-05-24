@@ -101,7 +101,7 @@ const Footer = () => {
                                     <FaMapMarkerAlt />
                                 </span>
                                 <span className="group-hover:text-purple-400 transition-colors duration-300">
-                                    8 Muthoorani East Karaikudi, 630001.
+                                    8, Muthoorani East, Karaikudi, 630001.
                                 </span>
                             </div>
                         </div>
@@ -143,7 +143,7 @@ const Footer = () => {
                 <div className="pt-8 border-t border-white/10">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         <p className="text-gray-400 text-sm">
-                            © {new Date().getFullYear()} Sunglass Chettinad Private Limited, 8 Muthoorani East Karaikudi.
+                            © {new Date().getFullYear()} Sunglass Chettinad Private Limited, 8 Muthoorani East, Karaikudi.
                         </p>
                         <div className="flex items-center space-x-6">
                             <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors duration-300">

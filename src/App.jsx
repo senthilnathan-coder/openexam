@@ -26,9 +26,13 @@ const App = () => {
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Navigate to="/home" />} />
               <Route path="home" element={<Home />} />
+
+              <Route path="pricing" element={<PricingPlans />} />
+            </Route>
+
+            <Route>
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<Signup />} />
-              <Route path="pricing" element={<PricingPlans />} />
             </Route>
 
             {/* Protected Routes */}
