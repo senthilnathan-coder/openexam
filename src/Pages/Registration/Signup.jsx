@@ -5,6 +5,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaImage } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
+
+
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 const Signup = () => {
   const navigate = useNavigate();
   const { signup } = useAuth();
@@ -49,7 +56,7 @@ const Signup = () => {
           // Store user data including ID in localStorage
           if (result.user) {
             localStorage.setItem('user', JSON.stringify(result.user));
-            localStorage.setItem('userId', result.user.id);
+            localStorage.setItem('userId', result.user._id);
           }
           // Add a success message before redirecting
           toast.success('Account created successfully!');
